@@ -4,6 +4,8 @@ services:
     build: training-diary-backend
     ports:
       - "5000:5000"
+    depends_on:
+      - mongo
     links:
       - mongo
   mongo:

@@ -1,4 +1,6 @@
 from flask import Flask
+
+
 from models import DataAccess
 
 
@@ -16,4 +18,4 @@ def test_db_connect():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host='0.0.0.0', port=8080)
+    app.run(debug=True, host='0.0.0.0', port=5000)

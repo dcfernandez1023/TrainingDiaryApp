@@ -43,19 +43,26 @@ def test_update_user():
 
 def test_update_user_protected_fields():
     user = User.User()
-    curr_id = TEST_USER_DATA.get("user_id")
-    curr_email = TEST_USER_DATA.get("email")
     # Try to update user_id and email
-    TEST_USER_DATA.update({
+    data_copy = TEST_USER_DATA.copy()
+    data_copy.update({
         "user_id": "user01",
         "email": "new@gmail.com"
     })
-    res = user.update(TEST_USER_DATA)
-    TEST_USER_DATA.update({
-        "user_id": curr_id,
-        "email": curr_email
-    })
+    res = user.update(data_copy)
     # Expecting it to return none when protected fields are attempted to be updated
+    assert res is None
+
+
+def test_update_fields_with_invalid_data_types():
+    user = User.User()
+    # Try to update data with invalid types
+    data_copy = TEST_USER_DATA.copy()
+    data_copy.update({
+        "first_name": 123,
+        "birthday": "This is a string"
+    })
+    res = user.update(data_copy)
     assert res is None
 
 

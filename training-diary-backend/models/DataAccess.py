@@ -64,5 +64,5 @@ class DataAccess:
         for collection in self.COLLECTIONS:
             if collection not in collection_list:
                 new_collection = self.__db[collection]
-                new_collection.insert({"_id": "init"})
+                new_collection.insert_one({"_id": "init"})
 

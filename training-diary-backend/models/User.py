@@ -1,5 +1,6 @@
-from models import DataAccess
 import uuid
+
+from models import DataAccess
 
 
 class User:
@@ -24,8 +25,8 @@ class User:
         return self.__db.get({"_id": user_id}, self.__collection)
 
     def create(self, data):
-        if self.__validate_data(data):
-            uid = str(uuid.uuid1())
+        if self.__validate_data(data) and not self.__does_user_with_this_email_exist(data["email"]):
+            uid = "user" + str(uuid.uuid1())
             data.update({
                 "_id": uid,
                 "user_id": uid
@@ -59,5 +60,11 @@ class User:
         for key in self.SCHEMA:
             if key not in data or not isinstance(data[key], self.SCHEMA[key]):
                 return False
+        return True
+
+    def __does_user_with_this_email_exist(self, email):
+        user = self.__db.get({"email": email}, "users")
+        if len(user) == 0:
+            return False
         return True
 
