@@ -69,7 +69,7 @@ def test_update_diet():
         "notes": "Updated notes section",
         "year": datetime.datetime.today().year - 1
     })
-    res = diet.update(TEST_USER_DATA["user_id"], copy)
+    res = diet.update(copy)
     assert res is not None and res == copy
 
 
@@ -81,7 +81,7 @@ def test_update_protected_fields():
         "diet_id": "new diet_id",
         "year": datetime.datetime.today().year - 1
     })
-    res = diet.update(TEST_USER_DATA["user_id"], copy)
+    res = diet.update(copy)
     assert res is None
 
 
@@ -93,7 +93,7 @@ def test_update_with_invalid_data_types():
         "notes": 100,
         "year": "this should be an int"
     })
-    res = diet.update(TEST_USER_DATA["user_id"], copy)
+    res = diet.update(copy)
     assert res is None
 
 

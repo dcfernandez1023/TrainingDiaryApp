@@ -39,7 +39,7 @@ class Diet:
     def create(self, user_id, data):
         if self.__validate_data(data):
             entry_today = self.__db.get({
-                "_id": user_id,
+                "user_id": user_id,
                 "day": data["day"],
                 "month": data["month"],
                 "year": data["year"]
@@ -56,13 +56,14 @@ class Diet:
                 diet_id = "diet" + str(uuid.uuid1())
                 data.update({
                     "_id": diet_id,
+                    "user_id": user_id,
                     "diet_id": diet_id
                 })
                 self.__db.write_one(data, self.__collection)
                 return data
         return None
 
-    def update(self, user_id, data):
+    def update(self, data):
         if self.__validate_data(data):
             # Prevent protected fields from being updated
             current_data = self.__db.get({"_id": data["diet_id"]}, self.__collection)
@@ -72,7 +73,7 @@ class Diet:
             for field in self.__protected_fields:
                 if current_diet.get(field) != data.get(field):
                     return None
-            self.__db.update_one({"_id": user_id}, data, self.__collection)
+            self.__db.update_one({"_id": data["diet_id"]}, data, self.__collection)
             return data
         return None
 
