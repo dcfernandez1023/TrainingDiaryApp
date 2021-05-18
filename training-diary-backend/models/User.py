@@ -15,6 +15,7 @@ class User:
 
     def __init__(self):
         self.__protected_fields = [
+            "_id",
             "user_id",
             "email"
         ]
@@ -51,9 +52,8 @@ class User:
         return None
 
     def delete(self, user_id):
-        filter = {"_id": user_id}
         for collection in DataAccess.DataAccess.COLLECTIONS:
-            self.__db.delete_many(filter, collection)
+            self.__db.delete_many({"_id": user_id}, collection)
         return user_id
 
     def __validate_data(self, data):

@@ -6,7 +6,7 @@ import pytest
 
 TEST_USER_DATA = {
     "user_id": "",
-    "email": "user@gmail.com",
+    "email": "user1@gmail.com",
     "first_name": "Bob",
     "last_name": "Smith",
     "birthday": 972284400000
