@@ -1,4 +1,4 @@
-# Unit tests for BodyWeight model object
+# Unit tests for Body Fat model object
 
 import time
 import datetime

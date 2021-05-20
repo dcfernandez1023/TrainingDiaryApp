@@ -1,7 +1,4 @@
-# Unit tests for BodyWeight model object
-
-import time
-import datetime
+# Unit tests for Exercise model object
 
 from models import Exercise
 
