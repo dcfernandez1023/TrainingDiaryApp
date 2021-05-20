@@ -28,7 +28,7 @@ class BodyWeight:
     def get(self, user_id):
         return self.__db.get({"_id": user_id}, self.__collection)
 
-    def get_one(self, user_id, bw_id):
+    def get_one(self, bw_id):
         res = self.__db.get({"_id": bw_id}, self.__collection)
         if len(res) > 1 or len(res) == 0:
             return None
