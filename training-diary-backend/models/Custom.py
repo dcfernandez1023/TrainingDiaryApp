@@ -36,7 +36,7 @@ class Custom:
         return res[0]
 
     def create(self, user_id, data):
-        if self.__validate_data(data) and self.__contains_default_schema(data) and self.__is_valid_data_type(data["custom_schema"]):
+        if self.__validate_data(data) and self.__contains_default_schema(data["custom_schema"]) and self.__is_valid_data_type(data["custom_schema"]):
             custom_id = "custom" + str(uuid.uuid1())
             data.update({
                 "_id": custom_id,
@@ -48,7 +48,7 @@ class Custom:
         return None
 
     def update(self, data):
-        if self.__validate_data(data) and self.__contains_default_schema(data) and self.__is_valid_data_type(data["custom_schema"]):
+        if self.__validate_data(data) and self.__contains_default_schema(data["custom_schema"]) and self.__is_valid_data_type(data["custom_schema"]):
             # Prevent protected fields from being updated
             current_data = self.__db.get({"_id": data["custom_id"]}, self.__collection)
             if len(current_data) == 0:
@@ -73,6 +73,7 @@ class Custom:
         return True
 
     def __contains_default_schema(self, data):
+        print(data)
         for key in self.__custom_schema_default:
             if key not in data:
                 return False
