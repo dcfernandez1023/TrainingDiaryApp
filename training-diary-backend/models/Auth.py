@@ -34,6 +34,8 @@ class Auth:
             self.__db.write_one(cred_data, self.__collection)
             return self.__encode_api_token(user_id)
         else:
+            # delete user if failed to register
+            self.__db.delete_one({"_id": user_id}, "users")
             raise Exception("Invalid Registration Data")
 
     def login(self, email, password):

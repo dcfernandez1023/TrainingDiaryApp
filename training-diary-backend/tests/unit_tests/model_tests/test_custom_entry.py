@@ -50,7 +50,7 @@ def test_get_many():
 
 
 def test_update():
-    entry = ExerciseEntry.ExerciseEntry()
+    entry = CustomEntry.CustomEntry()
     copy = dict(TEST_ENTRY_DATA)
     copy.update({
         "timestamp": int(time.time()),
@@ -69,7 +69,7 @@ def test_update_protected_fields():
     copy.update({
         "user_id": "test",
         "custom_entry_id": "test",
-        "custom_entry_id": "test"
+        "custom_id": "test"
     })
     res = entry.update(copy)
     assert res is None

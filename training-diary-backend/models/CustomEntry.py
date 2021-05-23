@@ -39,6 +39,7 @@ class CustomEntry:
             custom_entry_id = "custom_entry" + str(uuid.uuid1())
             data.update({
                 "_id": custom_entry_id,
+                "custom_entry_id": custom_entry_id,
                 "custom_id": data["custom_id"],
                 "user_id": user_id
             })
