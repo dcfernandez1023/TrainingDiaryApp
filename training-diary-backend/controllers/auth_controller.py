@@ -1,15 +1,10 @@
 from models import Auth, User
-from flask import make_response, request, Blueprint
+from flask import make_response, request
 
 
-AUTH_BLUEPRINT = Blueprint("auth_blueprint", __name__)
-
-
-@AUTH_BLUEPRINT.route("/api/auth/register")
-def register():
+def register(request_body):
     try:
         # Create user
-        request_body = request.get_json()
         user_data = request_body.get("user_data")
         password = request_body.get("password")
         new_user = User.User().create(user_data)
@@ -22,3 +17,24 @@ def register():
     except Exception as e:
         return make_response({"message": str(e)}, 500)
 
+
+def login(request_body):
+    try:
+        email = request_body.get("email")
+        password = request_body.get("password")
+        data = Auth.Auth().login(email, password)
+        return make_response({"data": data, "message": "Success"}, 200)
+    except Exception as e:
+        return make_response({"message": str(e)}, 500)
+
+
+def refresh(request_body):
+    try:
+        token = request_body.get("token")
+        user_id = request_body.get("user_id")
+        data = Auth.Auth().refresh_api_token(token, user_id)
+        if token is None:
+            return make_response({"message": "Unauthorized"}, 401)
+        return make_response({"token": data, "message": "Success"}, 200)
+    except Exception as e:
+        return make_response({"message": str(e)}, 500)

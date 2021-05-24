@@ -43,7 +43,7 @@ class Auth:
         if user is None:
             raise Exception("No Such User Exists")
         if self.__verify_password(user["user_id"], password):
-            return self.__encode_api_token(user["user_id"])
+            return dict(token=self.__encode_api_token(user["user_id"]), user_id=user["user_id"])
         else:
             raise Exception("Incorrect Password")
 
