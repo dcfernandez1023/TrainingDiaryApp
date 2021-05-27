@@ -1,5 +1,5 @@
 from models import Auth, User
-from flask import make_response, request
+from flask import make_response
 
 
 def register(request_body):

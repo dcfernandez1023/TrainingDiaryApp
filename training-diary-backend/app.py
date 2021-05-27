@@ -1,5 +1,5 @@
 from flask import Flask
-from routes import auth_routes, user_routes
+from routes import auth_routes, user_routes, exercise_routes
 
 
 app = Flask(__name__)
@@ -13,4 +13,5 @@ def index():
 if __name__ == "__main__":
     app.register_blueprint(auth_routes.AUTH_BLUEPRINT)
     app.register_blueprint(user_routes.USER_BLUEPRINT)
+    app.register_blueprint(exercise_routes.EXERCISE_BLUEPRINT)
     app.run(debug=True, host='0.0.0.0', port=5000)

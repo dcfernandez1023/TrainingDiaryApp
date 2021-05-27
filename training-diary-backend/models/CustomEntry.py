@@ -26,7 +26,7 @@ class CustomEntry:
         self.__db = DataAccess.DataAccess()
 
     def get(self, user_id):
-        return self.__db.get({"_id": user_id}, self.__collection)
+        return self.__db.get({"user_id": user_id}, self.__collection)
 
     def get_one(self, custom_entry_id):
         res = self.__db.get({"_id": custom_entry_id}, self.__collection)
@@ -46,6 +46,18 @@ class CustomEntry:
             self.__db.write_one(data, self.__collection)
             return data
         return None
+
+    def create_many(self, data):
+        for entry in data:
+            if self.__validate_data(entry):
+                custom_entry_id = "custom_entry" + str(uuid.uuid1())
+                entry.update({
+                    "_id": custom_entry_id,
+                    "custom_entry_id": custom_entry_id
+                })
+            else:
+                return None
+        return data
 
     def update(self, data):
         if self.__validate_data(data):

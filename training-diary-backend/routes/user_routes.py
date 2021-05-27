@@ -19,9 +19,14 @@ def call_api(func_name):
         if func_name not in ENDPOINTS:
             message = "No such endpoint " + "'" + func_name + "'"
             return make_response({"message": message}, 404)
-        request_body = request.get_json()
         model = User.User()
-        params = CONTROLLER.deconstruct_request_body(request_body)
+        # GET requests have no request bodies, so we must get data from the header
+        if func_name == "get":
+            user_id = request.headers.get("user_id")
+            token = request.headers.get("token")
+            return CONTROLLER.execute_model_logic(token, user_id, model, "get", dict(user_id=user_id))
+        request_body = request.get_json()
+        params = CONTROLLER.deconstruct_request_body(request_body, model, func_name)
         params.update({"model": model, "function_name": func_name})
         return CONTROLLER.execute_model_logic(**params)
     except Exception as e:

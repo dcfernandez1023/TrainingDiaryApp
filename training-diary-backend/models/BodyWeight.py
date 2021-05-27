@@ -26,7 +26,7 @@ class BodyWeight:
         self.__db = DataAccess.DataAccess()
 
     def get(self, user_id):
-        return self.__db.get({"_id": user_id}, self.__collection)
+        return self.__db.get({"user_id": user_id}, self.__collection)
 
     def get_one(self, bw_id):
         res = self.__db.get({"_id": bw_id}, self.__collection)

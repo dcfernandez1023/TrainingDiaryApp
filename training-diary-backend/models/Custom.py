@@ -27,7 +27,7 @@ class Custom:
         ]
 
     def get(self, user_id):
-        return self.__db.get({"_id": user_id}, self.__collection)
+        return self.__db.get({"user_id": user_id}, self.__collection)
 
     def get_one(self, custom_id):
         res = self.__db.get({"_id": custom_id}, self.__collection)

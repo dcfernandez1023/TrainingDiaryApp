@@ -47,7 +47,7 @@ def test_login_with_incorrect_email():
 
 def test_refresh_api_token():
     auth = Auth.Auth()
-    api_token = auth.login(TEST_USER_DATA["email"], "password")
+    api_token = auth.login(TEST_USER_DATA["email"], "password")["token"]
     new_token = auth.refresh_api_token(api_token, TEST_USER_DATA["user_id"])
     assert new_token is not None
 

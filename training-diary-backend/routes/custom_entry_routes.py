@@ -1,9 +1,9 @@
 from flask import request, make_response, Blueprint
 from controllers import AppController
-from models import Exercise
+from models import CustomEntry
 
 
-EXERCISE_BLUEPRINT = Blueprint("EXERCISE_BLUEPRINT", __name__)
+CUSTOM_ENTRY_BLUEPRINT = Blueprint("CUSTOM_ENTRY_BLUEPRINT", __name__)
 CONTROLLER = AppController.AppController()
 ENDPOINTS = [
     "get",
@@ -13,13 +13,13 @@ ENDPOINTS = [
 ]
 
 
-@EXERCISE_BLUEPRINT.route("/api/exercise/<func_name>", methods=["GET", "POST", "PUT", "DELETE"])
+@CUSTOM_ENTRY_BLUEPRINT.route("/api/exercise/<func_name>", methods=["GET", "POST", "PUT", "DELETE"])
 def call_api(func_name):
     try:
         if func_name not in ENDPOINTS:
             message = "No such endpoint " + "'" + func_name + "'"
             return make_response({"message": message}, 404)
-        model = Exercise.Exercise()
+        model = CustomEntry.CustomEntry()
         # GET requests have no request bodies, so we must get data from the header
         if func_name == "get":
             user_id = request.headers.get("user_id")
@@ -28,7 +28,6 @@ def call_api(func_name):
         request_body = request.get_json()
         params = CONTROLLER.deconstruct_request_body(request_body, model, func_name)
         params.update({"model": model, "function_name": func_name})
-        print(params)
         return CONTROLLER.execute_model_logic(**params)
     except Exception as e:
         return make_response({"message": "Internal Error: " + str(e)}, 500)

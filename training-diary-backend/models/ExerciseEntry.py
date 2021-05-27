@@ -26,7 +26,7 @@ class ExerciseEntry:
         self.__db = DataAccess.DataAccess()
 
     def get(self, user_id):
-        return self.__db.get({"_id": user_id}, self.__collection)
+        return self.__db.get({"user_id": user_id}, self.__collection)
 
     def get_one(self, exercise_entry_id):
         res = self.__db.get({"_id": exercise_entry_id}, self.__collection)
@@ -46,6 +46,18 @@ class ExerciseEntry:
             self.__db.write_one(data, self.__collection)
             return data
         return None
+
+    def create_many(self, data):
+        for entry in data:
+            if self.__validate_data(entry) and self.__does_exercise_exist(data["exercise_id"]):
+                exercise_entry_id = "exercise_entry" + str(uuid.uuid1())
+                entry.update({
+                    "_id": exercise_entry_id,
+                    "exercise_entry_id": exercise_entry_id
+                })
+            else:
+                return None
+        return data
 
     def update(self, data):
         if self.__validate_data(data) and self.__does_exercise_exist(data["exercise_id"]):

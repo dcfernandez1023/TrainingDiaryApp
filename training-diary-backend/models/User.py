@@ -52,8 +52,9 @@ class User:
         return None
 
     def delete(self, user_id):
+        self.__db.delete_one({"_id": user_id}, "users")
         for collection in DataAccess.DataAccess.COLLECTIONS:
-            self.__db.delete_many({"_id": user_id}, collection)
+            self.__db.delete_many({"user_id": user_id}, collection)
         return user_id
 
     def __validate_data(self, data):
