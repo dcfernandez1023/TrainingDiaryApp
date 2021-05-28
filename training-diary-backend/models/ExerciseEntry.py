@@ -49,7 +49,7 @@ class ExerciseEntry:
 
     def create_many(self, data):
         for entry in data:
-            if self.__validate_data(entry) and self.__does_exercise_exist(data["exercise_id"]):
+            if self.__validate_data(entry) and self.__does_exercise_exist(entry["exercise_id"]):
                 exercise_entry_id = "exercise_entry" + str(uuid.uuid1())
                 entry.update({
                     "_id": exercise_entry_id,
@@ -57,6 +57,7 @@ class ExerciseEntry:
                 })
             else:
                 return None
+        self.__db.write_many(data, self.__collection)
         return data
 
     def update(self, data):

@@ -8,12 +8,13 @@ CONTROLLER = AppController.AppController()
 ENDPOINTS = [
     "get",
     "create",
+    "create_many",
     "update",
     "delete"
 ]
 
 
-@EXERCISE_ENTRY_BLUEPRINT.route("/api/exercise/<func_name>", methods=["GET", "POST", "PUT", "DELETE"])
+@EXERCISE_ENTRY_BLUEPRINT.route("/api/exercise_entry/<func_name>", methods=["GET", "POST", "PUT", "DELETE"])
 def call_api(func_name):
     try:
         if func_name not in ENDPOINTS:

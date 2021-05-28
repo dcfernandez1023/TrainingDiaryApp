@@ -1,0 +1,26 @@
+.login-jumbotron {
+  display: flex;
+  align-items: center;
+  height: 100vh;
+  background: transparent !important;
+}
+
+.login-card {
+  height: 30vh;
+}
+
+.login-button-align {
+  text-align: center;
+}
+
+.try-out-button-align {
+  text-align: right;
+}
+
+.try-out-button-spacing {
+  margin-left: 10px;
+}
+
+.forgot-password-align {
+  text-align: right;
+}

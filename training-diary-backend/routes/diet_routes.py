@@ -13,7 +13,7 @@ ENDPOINTS = [
 ]
 
 
-@DIET_BLUEPRINT.route("/api/exercise/<func_name>", methods=["GET", "POST", "PUT", "DELETE"])
+@DIET_BLUEPRINT.route("/api/diet/<func_name>", methods=["GET", "POST", "PUT", "DELETE"])
 def call_api(func_name):
     try:
         if func_name not in ENDPOINTS:

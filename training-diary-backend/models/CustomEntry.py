@@ -57,6 +57,7 @@ class CustomEntry:
                 })
             else:
                 return None
+        self.__db.write_many(data, self.__collection)
         return data
 
     def update(self, data):

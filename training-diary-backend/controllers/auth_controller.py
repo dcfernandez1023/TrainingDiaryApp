@@ -23,6 +23,10 @@ def login(request_body):
         email = request_body.get("email")
         password = request_body.get("password")
         data = Auth.Auth().login(email, password)
+        if data is None:
+            return make_response({"message": "No such user with email " + "'" + email + "'"}, 400)
+        if not data:
+            return make_response({"message": "Incorrect password"}, 401)
         return make_response({"data": data, "message": "Success"}, 200)
     except Exception as e:
         return make_response({"message": str(e)}, 500)
@@ -30,6 +34,7 @@ def login(request_body):
 
 def refresh(request_body):
     try:
+        print(request_body)
         token = request_body.get("token")
         user_id = request_body.get("user_id")
         data = Auth.Auth().refresh_api_token(token, user_id)

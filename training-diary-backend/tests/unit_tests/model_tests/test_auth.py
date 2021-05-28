@@ -35,14 +35,12 @@ def test_login():
 
 def test_login_with_incorrect_password():
     auth = Auth.Auth()
-    with pytest.raises(Exception):
-        auth.login(TEST_USER_DATA["email"], "incorrect password")
+    assert auth.login(TEST_USER_DATA["email"], "incorrect password") == False
 
 
 def test_login_with_incorrect_email():
     auth = Auth.Auth()
-    with pytest.raises(Exception):
-        auth.login("incorrect_email@gmail.com", "password")
+    assert auth.login("incorrect_email@gmail.com", "password") is None
 
 
 def test_refresh_api_token():

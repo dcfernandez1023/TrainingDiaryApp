@@ -13,7 +13,7 @@ ENDPOINTS = [
 ]
 
 
-@CUSTOM_ENTRY_BLUEPRINT.route("/api/exercise/<func_name>", methods=["GET", "POST", "PUT", "DELETE"])
+@CUSTOM_ENTRY_BLUEPRINT.route("/api/custom_entry/<func_name>", methods=["GET", "POST", "PUT", "DELETE"])
 def call_api(func_name):
     try:
         if func_name not in ENDPOINTS:

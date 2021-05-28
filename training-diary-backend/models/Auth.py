@@ -1,7 +1,6 @@
 import datetime
 import hashlib
 import os
-import uuid
 import jwt
 
 from models import DataAccess
@@ -41,11 +40,11 @@ class Auth:
     def login(self, email, password):
         user = self.__get_user_by_email(email)
         if user is None:
-            raise Exception("No Such User Exists")
+            return None
         if self.__verify_password(user["user_id"], password):
             return dict(token=self.__encode_api_token(user["user_id"]), user_id=user["user_id"])
         else:
-            raise Exception("Incorrect Password")
+            return False
 
     def refresh_api_token(self, token, user_id):
         decode = self.__decode_api_token(token)
@@ -81,7 +80,7 @@ class Auth:
                 'iat': datetime.datetime.utcnow(),
                 'sub': user_id
             }
-            return jwt.encode (
+            return jwt.encode(
                 payload,
                 self.__secret_key,
                 algorithm="HS256"
