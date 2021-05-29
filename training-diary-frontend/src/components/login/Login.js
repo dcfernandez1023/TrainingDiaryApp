@@ -62,7 +62,23 @@ const Login = (props) => {
     if(registerPassword !== passwordConfirm) {
       setIsError(true);
       setErrorMsg("Passwords do not match");
+      return;
     }
+    // prepare data to send to register api
+    var data = Object.assign({}, newUser);
+    data.birthday = new Date(document.getElementById("register-birthday").value).getTime();
+    const callback = (res) => {
+      if(res.status == 200) {
+        props.setIsLoggedIn(true);
+        LOCAL_STORAGE.setStorageItem("TRAINING_DIARY_API_TOKEN", res.data.token);
+        LOCAL_STORAGE.setStorageItem("TRAINING_DIARY_USER", res.data.user_id);
+      }
+    };
+    const callbackOnError = (error) => {
+      setIsError(true);
+      setErrorMsg(error.response.data.message);
+    };
+    AUTH.register(data, registerPassword, callback, callbackOnError);
   }
 
   const onChangeRegister = (event) => {

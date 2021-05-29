@@ -60,7 +60,9 @@ const App = () => {
         setIsLoggedIn={setIsLoggedIn}
       />
       :
-      <Home />
+      <Home
+        setIsLoggedIn={setIsLoggedIn}
+      />
     }
     </div>
   );

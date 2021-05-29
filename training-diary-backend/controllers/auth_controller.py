@@ -13,7 +13,7 @@ def register(request_body):
             return make_response({"message": "Bad request"}, 400)
         # Register newly created user
         token = Auth.Auth().register(new_user["user_id"], password)
-        return make_response({"token": token, "message": "Success"}, 200)
+        return make_response({"token": token, "user_id": new_user["user_id"], "message": "Success"}, 200)
     except Exception as e:
         return make_response({"message": str(e)}, 500)
 

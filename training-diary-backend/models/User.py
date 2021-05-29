@@ -26,7 +26,9 @@ class User:
         return self.__db.get({"_id": user_id}, self.__collection)
 
     def create(self, data):
-        if self.__validate_data(data) and not self.__does_user_with_this_email_exist(data["email"]):
+        if self.__does_user_with_this_email_exist(data["email"]):
+            raise Exception("An account with this email already exists")
+        if self.__validate_data(data):
             uid = "user" + str(uuid.uuid1())
             data.update({
                 "_id": uid,
