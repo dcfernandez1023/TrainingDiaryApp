@@ -15,11 +15,11 @@
 /training-diary-frontend/build
 
 # misc
-.DS_Store
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+/training-diary-frontend/.DS_Store
+/training-diary-frontend/.env.local
+/training-diary-frontend/.env.development.local
+/training-diary-frontend/.env.test.local
+/training-diary-frontend/.env.production.local
 
 npm-debug.log*
 yarn-debug.log*
