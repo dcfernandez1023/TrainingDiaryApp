@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = process.env.REACT_APP_DEV_API_HOST;
 const BASE = "/api/auth";
 
 // refreshes an api token
@@ -19,7 +19,7 @@ export const refreshToken = (user_id, token, callback, callbackOnError) => {
     });
 }
 
-// registers a user 
+// registers a user
 export const register = (newUser, password, callback, callbackOnError) => {
   var endpoint = BASE_URL + BASE + "/register";
   var body = {

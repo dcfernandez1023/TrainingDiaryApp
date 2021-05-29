@@ -1,0 +1,12 @@
+.add-button-align {
+  text-align: right;
+}
+
+.exercise-modal-input-spacing {
+  margin-bottom: 10px;
+}
+
+.exercise-card-buttons {
+  float: right;
+  margin-left: 5px;
+}

@@ -34,7 +34,6 @@ def login(request_body):
 
 def refresh(request_body):
     try:
-        print(request_body)
         token = request_body.get("token")
         user_id = request_body.get("user_id")
         data = Auth.Auth().refresh_api_token(token, user_id)
