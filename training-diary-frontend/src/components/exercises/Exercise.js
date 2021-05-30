@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-import { Container, Row, Col, Button, Spinner, Tabs, Tab, Card, Alert, Dropdown, DropdownButton, Table, ListGroup } from 'react-bootstrap';
+import { Container, Row, Col, Button, Spinner, Tabs, Tab, Card, Alert, Form, Dropdown, InputGroup, DropdownButton, Table, ListGroup } from 'react-bootstrap';
 
 import FatalError from '../generic/FatalError.js';
 import ExerciseModal from './ExerciseModal.js';
@@ -258,84 +258,106 @@ const Exercise = (props) => {
       <Tabs defaultActiveKey="saved">
         <Tab eventKey="saved" title="Saved">
           <br/>
-          <Row>
-          {exercises.map((exercise) => {
-            return (
-              <Col lg={4} key={exercise.exercise_id} className="exercise-card-spacing">
-                <Card
-                  bg="light"
-                  text="dark"
-                  className="exercise-card-height"
-                >
-                  <Card.Header>
-                    {exercise.name}
-                    <Button size="sm" variant="outline-dark" className="exercise-card-buttons"
-                      onClick={() => {openDeleteModal(exercise.exercise_id)}}
+          <div>
+          {exercises.length == 0 ?
+            <p className="no-exercises-align"> You have no saved exercises </p>
+          :
+            <Row>
+              {exercises.map((exercise) => {
+                return (
+                  <Col lg={4} key={exercise.exercise_id} className="exercise-card-spacing">
+                    <Card
+                      bg="light"
+                      text="dark"
+                      className="exercise-card-height"
                     >
-                      🗑️
-                    </Button>
-                    <Button size="sm" variant="outline-dark" className="exercise-card-buttons"
-                      onClick={() => {openEditModal(exercise.exercise_id)}}
-                    >
-                      ✏️
-                    </Button>
-                  </Card.Header>
-                  <Card.Body>
-                    <Row>
-                      <Col>
-                        <strong> {exercise.category} </strong>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col>
-                        {exercise.sets} x {exercise.reps} @ {exercise.amount} {exercise.units}
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col>
-                        <i> {exercise.description} </i>
-                      </Col>
-                    </Row>
-                  </Card.Body>
-                </Card>
-              </Col>
-            );
-          })}
-          </Row>
+                      <Card.Header>
+                        {exercise.name}
+                        <Button size="sm" variant="outline-dark" className="exercise-card-buttons"
+                          onClick={() => {openDeleteModal(exercise.exercise_id)}}
+                        >
+                          🗑️
+                        </Button>
+                        <Button size="sm" variant="outline-dark" className="exercise-card-buttons"
+                          onClick={() => {openEditModal(exercise.exercise_id)}}
+                        >
+                          ✏️
+                        </Button>
+                      </Card.Header>
+                      <Card.Body>
+                        <Row>
+                          <Col>
+                            <strong> {exercise.category} </strong>
+                          </Col>
+                        </Row>
+                        <Row>
+                          <Col>
+                            {exercise.sets} x {exercise.reps} @ {exercise.amount} {exercise.units}
+                          </Col>
+                        </Row>
+                        <Row>
+                          <Col>
+                            <i> {exercise.description} </i>
+                          </Col>
+                        </Row>
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                );
+              })}
+            </Row>
+          }
+          </div>
         </Tab>
         <Tab eventKey="logs" title="Logs">
           <br/>
           <Row>
-            <Col className="edit-delete-table-align">
+            <Col xs={6}>
+              <InputGroup>
+                <DropdownButton variant="dark" title="Sort By" className="sort-by-button">
+                </DropdownButton>
+                <Form.Control
+                  as="input"
+                />
+              <InputGroup.Append>
+                  <Button variant="outline-dark"> Search </Button>
+                </InputGroup.Append>
+              </InputGroup>
+            </Col>
+            <Col xs={6} className="edit-delete-table-align">
               <Button variant="outline-dark" className="edit-delete-table-buttons" disabled={selectedEntryId.length === 0}> ✏️ </Button>
               <Button variant="outline-dark" className="edit-delete-table-buttons" disabled={selectedEntryId.length === 0}> 🗑️ </Button>
             </Col>
           </Row>
           <br/>
-          <Table responsive bordered hover>
-            <thead>
-              <th> Date </th>
-              <th> Exercise Performed </th>
-              <th> Notes </th>
-            </thead>
-            <tbody>
-            {entries.map((entry) => {
-              return (
-                <tr
-                  id={entry.exercise_entry_id}
-                  key={entry.exercise_entry_id}
-                  className={selectedEntryId === entry.exercise_entry_id ? "selected-entry": ""}
-                  onClick={() => {selectEntryOnTable(entry.exercise_entry_id)}}
-                  action
-                >
-                  <td> {new Date(entry.timestamp).toLocaleDateString()} </td>
-                  <td> * Sets, reps, and amount will go here * </td>
-                  <td> {entry.notes} </td>
-                </tr>
-              );
-            })}
-            </tbody>
-          </Table>
+          {entries.length == 0 ?
+            <p className="no-exercises-align"> You have not logged any exercises </p>
+          :
+            <Table responsive bordered hover>
+              <thead>
+                <th> Date </th>
+                <th> Exercise Performed </th>
+                <th> Notes </th>
+              </thead>
+              <tbody>
+              {entries.map((entry) => {
+                return (
+                  <tr
+                    id={entry.exercise_entry_id}
+                    key={entry.exercise_entry_id}
+                    className={selectedEntryId === entry.exercise_entry_id ? "selected-entry": ""}
+                    onClick={() => {selectEntryOnTable(entry.exercise_entry_id)}}
+                    action
+                  >
+                    <td> {new Date(entry.timestamp).toLocaleDateString()} </td>
+                    <td> * Sets, reps, and amount will go here * </td>
+                    <td> {entry.notes} </td>
+                  </tr>
+                );
+              })}
+              </tbody>
+            </Table>
+          }
         </Tab>
         <Tab eventKey="insights" title="Insights">
         </Tab>

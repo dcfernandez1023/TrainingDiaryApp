@@ -31,6 +31,14 @@
   margin-left: 5px;
 }
 
+.sort-by-button {
+  margin-right: 10px;
+}
+
+.no-exercises-align {
+  text-align: center;
+}
+
 .table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
 
 }
