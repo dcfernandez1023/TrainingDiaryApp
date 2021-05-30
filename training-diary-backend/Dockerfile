@@ -10,5 +10,8 @@ EXPOSE 5000
 
 COPY . /app
 
+# Run unit tests
+#RUN python -m pytest tests/unit_tests
+
 # start app server
 CMD ["python", "app.py"]

@@ -1,0 +1,36 @@
+.add-button-align {
+  text-align: right;
+}
+
+.exercise-modal-input-spacing {
+  margin-bottom: 10px;
+}
+
+.exercise-card-buttons {
+  float: right;
+  margin-left: 5px;
+}
+
+.exercise-card-spacing {
+  margin-top: 15px;
+}
+
+.exercise-card-height {
+  height: 100%;
+}
+
+.selected-entry {
+  background-color: #F9E79F;
+}
+
+.edit-delete-table-align {
+  text-align: right;
+}
+
+.edit-delete-table-buttons {
+  margin-left: 5px;
+}
+
+.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+
+}

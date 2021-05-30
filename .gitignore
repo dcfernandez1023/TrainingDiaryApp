@@ -1,2 +1,27 @@
-# Backend
+# Back-end
+
 /training-diary-backend/venv
+
+# Front-end
+
+/training-diary-frontend/node_modules
+/training-diary-frontend/.pnp
+.pnp.js
+
+# testing
+/training-diary-frontend/coverage
+
+# production
+/training-diary-frontend/build
+
+# misc
+/training-diary-frontend/.DS_Store
+/training-diary-frontend/.env
+/training-diary-frontend/.env.local
+/training-diary-frontend/.env.development.local
+/training-diary-frontend/.env.test.local
+/training-diary-frontend/.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
