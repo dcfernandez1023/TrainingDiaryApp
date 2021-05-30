@@ -35,6 +35,7 @@ class Exercise:
         return res[0]
 
     def create(self, user_id, data):
+        print(data)
         if self.__validate_data(data):
             exercise_id = "exercise" + str(uuid.uuid1())
             data.update({

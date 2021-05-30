@@ -26,9 +26,9 @@ def call_api(func_name):
             token = request.headers.get("token")
             return CONTROLLER.execute_model_logic(token, user_id, model, "get", dict(user_id=user_id))
         request_body = request.get_json()
+        print(request_body)
         params = CONTROLLER.deconstruct_request_body(request_body, model, func_name)
         params.update({"model": model, "function_name": func_name})
-        print(params)
         return CONTROLLER.execute_model_logic(**params)
     except Exception as e:
         return make_response({"message": "Internal Error: " + str(e)}, 500)

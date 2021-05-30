@@ -36,7 +36,6 @@ const Home = (props) => {
     else {
       var parsed = parseInt(last);
       if(!isNaN(parsed) && parsed >= 0 && parsed <= TAB_COMPONENTS.length - 1) {
-        console.log("herere");
         setCurrentTab(parsed);
       }
       else {
