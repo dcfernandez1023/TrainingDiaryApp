@@ -4,6 +4,7 @@ import { Container, Row, Col, Button, Spinner, Tabs, Tab, Card, Alert, Form, Dro
 
 import FatalError from '../generic/FatalError.js';
 import ExerciseModal from './ExerciseModal.js';
+import EntryModal from './EntryModal.js';
 
 import '../../styles/exercise.css';
 
@@ -20,6 +21,7 @@ const Exercise = (props) => {
   const [addShow, setAddShow] = useState(false);
   const [editShow, setEditShow] = useState(false);
   const [deleteShow, setDeleteShow] = useState(false);
+  const [entryShow, setEntryShow] = useState(false);
   const [modalHeader, setModalHeader] = useState("");
   const [modalExercise, setModalExercise] = useState();
   const [modalType, setModalType] = useState("");
@@ -149,6 +151,10 @@ const Exercise = (props) => {
     CONTROLLER.getEntries(token, user_id, callback, callbackOnError);
   }
 
+  const createEntries = () => {
+    return;
+  }
+
   const openAddModal = () => {
     setAddShow(true);
     setModalHeader("Add Exercise");
@@ -208,6 +214,16 @@ const Exercise = (props) => {
     setModalExercise();
   }
 
+  const openEntryModal = () => {
+    setEntryShow(true);
+    setModalHeader("Log Exercise");
+  }
+
+  const closeEntryModal = () => {
+    setEntryShow(false);
+    setModalHeader("");
+  }
+
   const selectEntryOnTable = (entryId) => {
     if(selectedEntryId === entryId) {
       setSelectedEntryId("");
@@ -243,6 +259,13 @@ const Exercise = (props) => {
         onSubmitModal={addShow ? createExercise : editShow ? editExercise : deleteShow ? deleteExercise : undefined}
         type={modalType}
       />
+      <EntryModal
+        show={entryShow}
+        header={modalHeader}
+        exercises={exercises}
+        onClose={closeEntryModal}
+        onSubmitModal={createEntries}
+      />
       <Row>
         <Col xs={10}>
           <h3> Exercises 💪 </h3>
@@ -250,7 +273,7 @@ const Exercise = (props) => {
         <Col xs={2} className="add-button-align">
           <DropdownButton title="⚙️" variant="outline-dark" menuAlign="right">
             <Dropdown.Item onClick={openAddModal}> Add an Exercise </Dropdown.Item>
-            <Dropdown.Item> Log an Exercise </Dropdown.Item>
+            <Dropdown.Item onClick={openEntryModal}> Log an Exercise </Dropdown.Item>
           </DropdownButton>
         </Col>
       </Row>

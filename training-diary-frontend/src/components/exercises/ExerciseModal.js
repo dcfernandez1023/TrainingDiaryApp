@@ -13,9 +13,6 @@ const MODEL = require('../../models/exercise.js');
     * exercise
     * onClose
     * onSubmitModal
-    * showSpinner
-    * submitDisabled
-    * type
 */
 const ExerciseModal = (props) => {
   const [show, setShow] = useState(false);
