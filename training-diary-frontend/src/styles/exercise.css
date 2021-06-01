@@ -39,6 +39,22 @@
   text-align: center;
 }
 
+.entry-modal-next-align {
+  text-align: right;
+}
+
+.entry-modal-back-align {
+  text-align: left;
+}
+
+.entry-modal-create-new {
+  margin-left: 5px;
+}
+
+.entry-modal-create-new-align {
+  text-align: center;
+}
+
 .table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
 
 }

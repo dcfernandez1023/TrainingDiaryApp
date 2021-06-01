@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-import { Container, Row, Col, Button, Spinner, Form, Modal } from 'react-bootstrap';
+import { Container, Row, Col, Button, Spinner, Form, Modal, ListGroup } from 'react-bootstrap';
 
 const LOCAL_STORAGE = require('../../util/localStorageHelper.js');
 
@@ -8,66 +8,148 @@ const LOCAL_STORAGE = require('../../util/localStorageHelper.js');
 /*
    Props:
     * show
-    * header
     * entries
     * entryDate: timestamp
     * onClose
     * onSubmitModal
+    * createNew
 */
 const EntryModal = (props) => {
   const [show, setShow] = useState(false);
-  const [header, setHeader] = useState("");
   const [exercises, setExercises] = useState();
-  const [entryDate, setEntryDate] = useState(new Date());
+  const [entryDate, setEntryDate] = useState("");
   const [validated, setValidated] = useState(false);
   const [showSpinner, setShowSpinner] = useState(false);
   const [submitDisabled, setSubmitDisabled] = useState(false);
+  const [currScreen, setCurrScreen] = useState("date");
+  const [exercisesSelcted, setExercisesSelected] = useState({});
+  const [note, setNote] = useState("");
 
   useEffect(() => {
     setShow(props.show);
-    setHeader(props.header);
     setExercises(props.exercises);
     if(props.entryDate !== undefined && props.entryDate instanceof Date) {
       setEntryDate(props.entryDate);
     }
-  }, [props.show, props.header, props.exercises, props.entryDate]);
+  }, [props.show, props.exercises, props.entryDate]);
 
   const closeModal = () => {
     props.onClose();
     setValidated(false);
     setShowSpinner(false);
-    setSubmitDisabled(false)
+    setEntryDate("");
+    setCurrScreen("date");
+    setExercisesSelected({});
+    setSubmitDisabled(false);
+  }
+
+  const onSelectExercise = (exercise_id) => {
+    var copy = Object.assign({}, exercisesSelcted);
+    if(copy[exercise_id] === undefined) {
+      copy[exercise_id] = true;
+    }
+    else {
+      delete copy[exercise_id];
+    }
+    setExercisesSelected(copy);
   }
 
   return (
     <Modal show={show} onHide={closeModal} backdrop="static">
       <Modal.Header closeButton>
-        <Modal.Title> {header} </Modal.Title>
+        <Modal.Title> Log Exercise </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Row>
-          <Col xs={2}></Col>
-          <Col xs={8}>
-            <Form.Label> Date Performed </Form.Label>
-            <Form.Control
-              id="log-date"
-              as="input"
-              type="date"
-              //value={entryDate instanceof Date ? entryDate.toISOString().slice(0, 10) : ""}
-            />
-          </Col>
-          <Col xs={2}></Col>
-        </Row>
-        <br/>
-        <Row>
-          <Col>
-            <Form.Label> Exercises Performed </Form.Label>
-          </Col>
-        </Row>
+      {currScreen === "date" ?
+        <div>
+          <Row>
+            <Col></Col>
+            <Col xs={8}>
+              <Form.Label> Date Performed </Form.Label>
+              <Form.Control
+                id="log-date"
+                as="input"
+                type="date"
+                onChange={(event) => {
+                  setEntryDate(event.target.value);
+                }}
+                value={entryDate}
+              />
+            </Col>
+            <Col></Col>
+          </Row>
+          <br/>
+          <Row>
+            <Col className="entry-modal-next-align">
+              <Button variant="info" onClick={() => {setCurrScreen("exercises")}} disabled={entryDate.length == 0}> Next </Button>
+            </Col>
+          </Row>
+        </div>
+      :
+      currScreen === "exercises" ?
+        <div>
+          <Row>
+            <Col className="entry-modal-create-new-align">
+              Select from saved exercises or
+              <Button variant="info" size="sm" className="entry-modal-create-new" onClick={props.createNew}> Create New </Button>
+            </Col>
+          </Row>
+          <br/>
+          <Row>
+            <Col>
+              <ListGroup>
+              {props.exercises.map((exercise) => {
+                return (
+                  <ListGroup.Item
+                    variant={exercisesSelcted[exercise.exercise_id] !== undefined ? "info" : ""}
+                    onClick={() => {onSelectExercise(exercise.exercise_id)}}
+                    action
+                  >
+                    {exercise.name} | {exercise.category} | {exercise.sets} x {exercise.reps} @ {exercise.amount} {exercise.units}
+                  </ListGroup.Item>
+                );
+              })}
+              </ListGroup>
+            </Col>
+          </Row>
+          <br/>
+          <Row>
+            <Col className="entry-modal-back-align">
+              <Button variant="info" onClick={() => {setCurrScreen("date")}}> Back </Button>
+            </Col>
+            <Col className="entry-modal-next-align">
+              <Button variant="info" onClick={() => {setCurrScreen("notes")}} disabled={Object.keys(exercisesSelcted).length == 0}> Next </Button>
+            </Col>
+          </Row>
+        </div>
+      :
+      currScreen === "notes" ?
+        <div>
+          <Row>
+            <Col>
+              <Form.Label> Add a note </Form.Label>
+              <Form.Control
+                as="textarea"
+                value={note}
+                onChange={(event) => {setNote(event.target.value)}}
+                rows={4}
+              />
+            </Col>
+          </Row>
+          <br/>
+          <Row>
+            <Col className="entry-modal-back-align">
+              <Button variant="info" onClick={() => {setCurrScreen("exercises")}}> Back </Button>
+            </Col>
+            <Col className="entry-modal-next-align">
+              <Button variant="info"> Done </Button>
+            </Col>
+          </Row>
+        </div>
+      :
+        <div></div>
+      }
       </Modal.Body>
-      <Modal.Footer>
-        <Button variant="info"> Done </Button>
-      </Modal.Footer>
     </Modal>
   );
 }

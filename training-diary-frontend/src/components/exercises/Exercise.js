@@ -261,10 +261,10 @@ const Exercise = (props) => {
       />
       <EntryModal
         show={entryShow}
-        header={modalHeader}
         exercises={exercises}
         onClose={closeEntryModal}
         onSubmitModal={createEntries}
+        createNew={openAddModal}
       />
       <Row>
         <Col xs={10}>

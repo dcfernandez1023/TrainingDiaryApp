@@ -86,3 +86,19 @@ export const getEntries = (token, user_id, callback, callbackOnError) => {
       callbackOnError(error);
     });
 }
+
+// creates entries
+export const createEntries = (token, user_id, entries, callback, callbackOnError) => {
+  var endpoint = BASE_URL + ENTRY_BASE + "/create_many";
+  var body = {
+    token: token,
+    user_id: user_id,
+    data: entries
+  };
+  axios.post(endpoint, body)
+    .then((res) => {
+      callback(res);
+    }, (error) => {
+      callbackOnError(error);
+    });
+}
