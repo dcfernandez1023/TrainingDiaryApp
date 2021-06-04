@@ -17,6 +17,7 @@ const Exercise = (props) => {
   const [isFatal, setIsFatal] = useState(false);
   const [fatalMsg, setFatalMsg] = useState("");
   const [exercises, setExercises] = useState();
+  const [exerciseLookup, setExerciseLookup] = useState({});
   const [entries, setEntries] = useState();
   const [addShow, setAddShow] = useState(false);
   const [editShow, setEditShow] = useState(false);
@@ -32,6 +33,15 @@ const Exercise = (props) => {
     getEntries();
   }, []);
 
+  const generateExerciseLookup = (exercises) => {
+    var lookup = {};
+    for(var i = 0; i < exercises.length; i++) {
+      var exercise = exercises[i];
+      lookup[exercise.exercise_id] = exercise;
+    }
+    setExerciseLookup(lookup);
+  }
+
   const getExercises = () => {
     var token = LOCAL_STORAGE.getStorageItem("TRAINING_DIARY_API_TOKEN");
     var user_id = LOCAL_STORAGE.getStorageItem("TRAINING_DIARY_USER");
@@ -42,6 +52,7 @@ const Exercise = (props) => {
     }
     const callback = (res) => {
       setExercises(res.data.data);
+      generateExerciseLookup(res.data.data);
     };
     const callbackOnError = (error) => {
       setIsFatal(true);
@@ -62,6 +73,7 @@ const Exercise = (props) => {
       if(res.status == 200) {
         var copy = exercises.slice();
         copy.push(res.data.data);
+        generateExerciseLookup(copy);
         setExercises(copy);
       }
       modalCallback();
@@ -91,6 +103,7 @@ const Exercise = (props) => {
           }
         }
         setExercises(copy);
+        generateExerciseLookup(copy);
       }
       modalCallback();
     };
@@ -120,6 +133,7 @@ const Exercise = (props) => {
           }
         }
         setExercises(copy);
+        generateExerciseLookup(copy);
       }
       modalCallback();
     };
@@ -279,7 +293,7 @@ const Exercise = (props) => {
       </Row>
       <br/>
       <Tabs defaultActiveKey="saved">
-        <Tab eventKey="saved" title="Saved">
+        <Tab eventKey="saved" title="Saved ⬇️">
           <br/>
           <div>
           {exercises.length == 0 ?
@@ -332,7 +346,7 @@ const Exercise = (props) => {
           }
           </div>
         </Tab>
-        <Tab eventKey="logs" title="Logs">
+        <Tab eventKey="logs" title="Logs 📝">
           <br/>
           <Row>
             <Col xs={6}>
@@ -364,6 +378,10 @@ const Exercise = (props) => {
               </thead>
               <tbody>
               {entries.map((entry) => {
+                // var exercise = Object.keys(exerciseLookup).length == 0 ? undefined : exerciseLookup[entry.exercise_id];
+                var exercise = exerciseLookup[entry.exercise_id];
+                console.log(entry.exercise_id);
+                console.log(exerciseLookup);
                 return (
                   <tr
                     id={entry.exercise_entry_id}
@@ -373,7 +391,13 @@ const Exercise = (props) => {
                     action
                   >
                     <td> {new Date(entry.timestamp).toLocaleDateString()} </td>
-                    <td> * Sets, reps, and amount will go here * </td>
+                    <td>
+                    {exercise === undefined ?
+                      ""
+                    :
+                      exercise.name + " | " + exercise.category + " | "
+                    }
+                    </td>
                     <td> {entry.notes} </td>
                   </tr>
                 );
@@ -382,7 +406,7 @@ const Exercise = (props) => {
             </Table>
           }
         </Tab>
-        <Tab eventKey="insights" title="Insights">
+        <Tab eventKey="insights" title="Insights 📈">
         </Tab>
       </Tabs>
       <br/>
