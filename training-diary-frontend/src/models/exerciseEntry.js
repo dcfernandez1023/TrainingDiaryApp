@@ -23,8 +23,8 @@ class EntryMetaData {
 
 export const metaData = [
   new EntryMetaData("exercise_entry_id", "string", undefined, "", false, 0, []),
-  new EntryMetaData("exercise_id", "string", undefined, "", true, 0, []),
-  new EntryMetaData("user_id", "string", undefined, "", true, 0, []),
+  new EntryMetaData("exercise_id", "string", undefined, "", false, 0, []),
+  new EntryMetaData("user_id", "string", undefined, "", false, 0, []),
   new EntryMetaData("timestamp", "number", undefined, "", true, 0, []),
   new EntryMetaData("day", "number", undefined, "", true, 0, []),
   new EntryMetaData("month", "number", undefined, "", true, 0, []),

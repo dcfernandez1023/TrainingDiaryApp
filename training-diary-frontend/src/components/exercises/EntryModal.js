@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import { Container, Row, Col, Button, Spinner, Form, Modal, ListGroup } from 'react-bootstrap';
 
+const MODEL = require('../../models/exerciseEntry.js');
 const LOCAL_STORAGE = require('../../util/localStorageHelper.js');
 
 
@@ -52,6 +53,25 @@ const EntryModal = (props) => {
       delete copy[exercise_id];
     }
     setExercisesSelected(copy);
+  }
+
+  const handleSubmit = () => {
+    setShowSpinner(true);
+    var entries = [];
+    var user_id = LOCAL_STORAGE.getStorageItem("TRAINING_DIARY_USER");
+    var date = new Date(entryDate);
+    for(var exercise_id in exercisesSelcted) {
+      var entry = Object.assign({}, MODEL.exerciseEntry);
+      entry.exercise_id = exercise_id;
+      entry.user_id = user_id;
+      entry.timestamp = date.getTime();
+      entry.day = date.getDate() + 1;
+      entry.month = date.getMonth() + 1;
+      entry.year = date.getFullYear();
+      entry.notes = note;
+      entries.push(entry);
+    }
+    props.onSubmitModal(entries, closeModal);
   }
 
   return (
@@ -141,8 +161,15 @@ const EntryModal = (props) => {
             <Col className="entry-modal-back-align">
               <Button variant="info" onClick={() => {setCurrScreen("exercises")}}> Back </Button>
             </Col>
+            {showSpinner ?
+              <Col className="entry-modal-spinner-align">
+                <Spinner animation="border" variant="primary" />
+              </Col>
+            :
+              <div></div>
+            }
             <Col className="entry-modal-next-align">
-              <Button variant="info"> Done </Button>
+              <Button variant="info" onClick={handleSubmit}> Done </Button>
             </Col>
           </Row>
         </div>

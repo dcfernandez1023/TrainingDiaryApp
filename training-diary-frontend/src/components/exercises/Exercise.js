@@ -165,8 +165,32 @@ const Exercise = (props) => {
     CONTROLLER.getEntries(token, user_id, callback, callbackOnError);
   }
 
-  const createEntries = () => {
-    return;
+  const createEntries = (newEntries, modalCallback) => {
+    var token = LOCAL_STORAGE.getStorageItem("TRAINING_DIARY_API_TOKEN");
+    var user_id = LOCAL_STORAGE.getStorageItem("TRAINING_DIARY_USER");
+    if(token === null || token === undefined || user_id === null || user_id === undefined) {
+      //TODO: if token cannot be pulled from localstorage, log the user out
+      alert("Could not get token");
+      return;
+    }
+    const callback = (res) => {
+      if(res.status == 200) {
+        var copy = entries.slice();
+        for(var i = 0; i < res.data.data.length; i++) {
+          var entry = res.data.data[i];
+          copy.push(entry);
+        }
+        console.log(entries);
+        setEntries(copy);
+      }
+      modalCallback();
+    };
+    const callbackOnError = (error) => {
+      modalCallback();
+      setIsFatal(true);
+      setFatalMsg(error.response.data.message);
+    };
+    CONTROLLER.createEntries(token, user_id, newEntries, callback, callbackOnError);
   }
 
   const openAddModal = () => {
@@ -378,10 +402,7 @@ const Exercise = (props) => {
               </thead>
               <tbody>
               {entries.map((entry) => {
-                // var exercise = Object.keys(exerciseLookup).length == 0 ? undefined : exerciseLookup[entry.exercise_id];
                 var exercise = exerciseLookup[entry.exercise_id];
-                console.log(entry.exercise_id);
-                console.log(exerciseLookup);
                 return (
                   <tr
                     id={entry.exercise_entry_id}
@@ -395,7 +416,7 @@ const Exercise = (props) => {
                     {exercise === undefined ?
                       ""
                     :
-                      exercise.name + " | " + exercise.category + " | "
+                      exercise.name + " | " + exercise.category + " | " + exercise.sets + " x " + exercise.reps + " @ " + exercise.amount + " " + exercise.units
                     }
                     </td>
                     <td> {entry.notes} </td>
