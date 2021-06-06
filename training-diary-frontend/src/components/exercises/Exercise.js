@@ -26,7 +26,8 @@ const Exercise = (props) => {
   const [modalHeader, setModalHeader] = useState("");
   const [modalExercise, setModalExercise] = useState();
   const [modalType, setModalType] = useState("");
-  const [selectedEntryId, setSelectedEntryId] = useState("");
+  const [modalEntry, setModalEntry] = useState();
+  const [editingTable, setEditingTable] = useState(false);
 
   useEffect(() => {
     getExercises();
@@ -126,6 +127,7 @@ const Exercise = (props) => {
     const callback = (res) => {
       if(res.status == 200) {
         var copy = exercises.slice();
+        var copyEntries = [];
         for(var i = 0; i < copy.length; i++) {
           if(res.data.data === copy[i].exercise_id) {
             copy.splice(i, 1);
@@ -193,6 +195,35 @@ const Exercise = (props) => {
     CONTROLLER.createEntries(token, user_id, newEntries, callback, callbackOnError);
   }
 
+  const deleteEntry = (exercise_entry_id, modalCallback) => {
+    var token = LOCAL_STORAGE.getStorageItem("TRAINING_DIARY_API_TOKEN");
+    var user_id = LOCAL_STORAGE.getStorageItem("TRAINING_DIARY_USER");
+    if(token === null || token === undefined || user_id === null || user_id === undefined) {
+      //TODO: if token cannot be pulled from localstorage, log the user out
+      alert("Could not get token");
+      return;
+    }
+    const callback = (res) => {
+      if(res.status == 200) {
+        var copy = entries.slice();
+        for(var i = 0; i < copy.length; i++) {
+          if(copy[i].exercise_entry_id === res.data.data) {
+            copy.splice(i, 1);
+            break;
+          }
+        }
+        setEntries(copy);
+      }
+      modalCallback();
+    };
+    const callbackOnError = (error) => {
+      modalCallback();
+      setIsFatal(true);
+      setFatalMsg(error.response.data.message);
+    };
+    CONTROLLER.deleteEntry(token, user_id, exercise_entry_id, callback, callbackOnError);
+  }
+
   const openAddModal = () => {
     setAddShow(true);
     setModalHeader("Add Exercise");
@@ -252,23 +283,26 @@ const Exercise = (props) => {
     setModalExercise();
   }
 
-  const openEntryModal = () => {
+  const openEntryModal = (type, entry, exercise) => {
     setEntryShow(true);
-    setModalHeader("Log Exercise");
+    if(type === "delete") {
+      console.log(entry);
+      setModalHeader("Delete Log");
+      setModalType(type);
+      setModalEntry(entry);
+      setModalExercise(exercise);
+    }
+    else {
+      setModalHeader("Log Exercise");
+    }
   }
 
   const closeEntryModal = () => {
     setEntryShow(false);
     setModalHeader("");
-  }
-
-  const selectEntryOnTable = (entryId) => {
-    if(selectedEntryId === entryId) {
-      setSelectedEntryId("");
-    }
-    else {
-      setSelectedEntryId(entryId);
-    }
+    setModalType("");
+    setModalEntry();
+    setModalExercise();
   }
 
   if(isFatal) {
@@ -300,8 +334,12 @@ const Exercise = (props) => {
       <EntryModal
         show={entryShow}
         exercises={exercises}
+        header={modalHeader}
+        type={modalType}
+        entry={modalEntry}
+        exercise={modalExercise}
         onClose={closeEntryModal}
-        onSubmitModal={createEntries}
+        onSubmitModal={modalType === "delete" ? deleteEntry : createEntries}
         createNew={openAddModal}
       />
       <Row>
@@ -375,27 +413,39 @@ const Exercise = (props) => {
           <Row>
             <Col xs={6}>
               <InputGroup>
-                <DropdownButton variant="dark" title="Sort By" className="sort-by-button">
-                </DropdownButton>
                 <Form.Control
                   as="input"
                 />
-              <InputGroup.Append>
-                  <Button variant="outline-dark"> Search </Button>
+                <InputGroup.Append>
+                  <Button variant="info"> Search </Button>
                 </InputGroup.Append>
               </InputGroup>
             </Col>
-            <Col xs={6} className="edit-delete-table-align">
-              <Button variant="outline-dark" className="edit-delete-table-buttons" disabled={selectedEntryId.length === 0}> ✏️ </Button>
-              <Button variant="outline-dark" className="edit-delete-table-buttons" disabled={selectedEntryId.length === 0}> 🗑️ </Button>
+            <Col xs={6} className="right-align">
+              <DropdownButton variant="info" title="Sort By" className="sort-by-button"> </DropdownButton>
             </Col>
+            {/*
+            <Col xs={6} className="edit-delete-table-align">
+            {editingTable ?
+              <Button variant="outline-dark" className="edit-delete-table-buttons" onClick={() => {setEditingTable(false)}}> ✔️ </Button>
+            :
+              <Button variant="outline-dark" className="edit-delete-table-buttons" onClick={() => {setEditingTable(true)}}> ✏️ </Button>
+            }
+            </Col>
+            */}
           </Row>
           <br/>
           {entries.length == 0 ?
             <p className="no-exercises-align"> You have not logged any exercises </p>
           :
-            <Table responsive bordered hover>
+            <Table responsive bordered>
               <thead>
+              {editingTable ?
+                <th> # </th>
+              :
+                <div></div>
+              }
+                <th> # </th>
                 <th> Date </th>
                 <th> Exercise Performed </th>
                 <th> Notes </th>
@@ -407,19 +457,47 @@ const Exercise = (props) => {
                   <tr
                     id={entry.exercise_entry_id}
                     key={entry.exercise_entry_id}
-                    className={selectedEntryId === entry.exercise_entry_id ? "selected-entry": ""}
-                    onClick={() => {selectEntryOnTable(entry.exercise_entry_id)}}
                     action
                   >
-                    <td> {new Date(entry.timestamp).toLocaleDateString()} </td>
+                  {editingTable ?
                     <td>
+                      <Button variant="outline-dark" size="sm"> 🗑️ </Button>
+                    </td>
+                  :
+                    <div></div>
+                  }
+                    <td className="log-column-1">
+                      <Button variant="outline-dark" size="sm" onClick={() => openEntryModal("delete", entry, exerciseLookup[entry.exercise_id])}> 🗑️ </Button>
+                    </td>
+                    <td className="log-column-2">
+                    {editingTable ?
+                      <Form.Control
+                        as="input"
+                        type="date"
+                        value={new Date(entry.timestamp).toISOString().slice(0, 10)}
+                      />
+                    :
+                      new Date(entry.timestamp).toLocaleDateString()
+                    }
+                    </td>
+                    <td className="log-column-3">
                     {exercise === undefined ?
                       ""
                     :
                       exercise.name + " | " + exercise.category + " | " + exercise.sets + " x " + exercise.reps + " @ " + exercise.amount + " " + exercise.units
                     }
                     </td>
-                    <td> {entry.notes} </td>
+                    <td className="log-column-4">
+                    {editingTable ?
+                      <Form.Control
+                        as="textarea"
+                        rows="2"
+                        value={entry.notes}
+                      />
+                    :
+                      entry.notes
+                    }
+                    </td>
                   </tr>
                 );
               })}

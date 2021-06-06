@@ -9,7 +9,10 @@ const LOCAL_STORAGE = require('../../util/localStorageHelper.js');
 /*
    Props:
     * show
-    * entries
+    * exercises
+    * type
+    * entry
+    * exercise
     * entryDate: timestamp
     * onClose
     * onSubmitModal
@@ -18,6 +21,9 @@ const LOCAL_STORAGE = require('../../util/localStorageHelper.js');
 const EntryModal = (props) => {
   const [show, setShow] = useState(false);
   const [exercises, setExercises] = useState();
+  const [type, setType] = useState("");
+  const [entry, setEntry] = useState();
+  const [exercise, setExercise] = useState();
   const [entryDate, setEntryDate] = useState("");
   const [validated, setValidated] = useState(false);
   const [showSpinner, setShowSpinner] = useState(false);
@@ -29,6 +35,9 @@ const EntryModal = (props) => {
   useEffect(() => {
     setShow(props.show);
     setExercises(props.exercises);
+    setType(props.type);
+    setExercise(props.exercise);
+    setEntry(props.entry);
     if(props.entryDate !== undefined && props.entryDate instanceof Date) {
       setEntryDate(props.entryDate);
     }
@@ -57,23 +66,62 @@ const EntryModal = (props) => {
 
   const handleSubmit = () => {
     setShowSpinner(true);
-    var entries = [];
-    var user_id = LOCAL_STORAGE.getStorageItem("TRAINING_DIARY_USER");
-    var date = new Date(entryDate);
-    for(var exercise_id in exercisesSelcted) {
-      var entry = Object.assign({}, MODEL.exerciseEntry);
-      entry.exercise_id = exercise_id;
-      entry.user_id = user_id;
-      entry.timestamp = date.getTime();
-      entry.day = date.getDate() + 1;
-      entry.month = date.getMonth() + 1;
-      entry.year = date.getFullYear();
-      entry.notes = note;
-      entries.push(entry);
+    if(type === "delete") {
+      props.onSubmitModal(props.entry.exercise_entry_id, closeModal);
     }
-    props.onSubmitModal(entries, closeModal);
+    else {
+      var entries = [];
+      var user_id = LOCAL_STORAGE.getStorageItem("TRAINING_DIARY_USER");
+      var date = new Date(entryDate);
+      for(var exercise_id in exercisesSelcted) {
+        var entry = Object.assign({}, MODEL.exerciseEntry);
+        entry.exercise_id = exercise_id;
+        entry.user_id = user_id;
+        entry.timestamp = date.getTime();
+        entry.day = date.getDate() + 1;
+        entry.month = date.getMonth() + 1;
+        entry.year = date.getFullYear();
+        entry.notes = note;
+        entries.push(entry);
+      }
+      props.onSubmitModal(entries, closeModal);
+    }
   }
 
+  if(type === "delete") {
+    return (
+      <Modal show={show} onHide={closeModal} backdrop="static">
+        <Modal.Header closeButton>
+          <Modal.Title> {props.header} </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Row>
+            <Col>
+              {new Date(entry.timestamp).toLocaleDateString()}
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              {exercise.name + " | " + exercise.category + " | " + exercise.sets + " x " + exercise.reps + " @ " + exercise.amount + " " + exercise.units}
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <i> {entry.notes} </i>
+            </Col>
+          </Row>
+        </Modal.Body>
+        <Modal.Footer>
+        {showSpinner ?
+          <Spinner animation="border" variant="primary" />
+        :
+          <div></div>
+        }
+          <Button variant="danger" onClick={handleSubmit}> Delete </Button>
+        </Modal.Footer>
+      </Modal>
+    );
+  }
   return (
     <Modal show={show} onHide={closeModal} backdrop="static">
       <Modal.Header closeButton>

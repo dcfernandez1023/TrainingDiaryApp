@@ -102,3 +102,19 @@ export const createEntries = (token, user_id, entries, callback, callbackOnError
       callbackOnError(error);
     });
 }
+
+// deletes an entry
+export const deleteEntry = (token, user_id, exercise_entry_id, callback, callbackOnError) => {
+  var endpoint = BASE_URL + ENTRY_BASE + "/delete";
+  var body = {
+    token: token,
+    user_id: user_id,
+    exercise_entry_id: exercise_entry_id
+  };
+  axios.post(endpoint, body)
+    .then((res) => {
+      callback(res);
+    }, (error) => {
+      callbackOnError(error);
+    });
+}
