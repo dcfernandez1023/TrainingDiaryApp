@@ -8,7 +8,7 @@ class AppController:
     def __init__(self):
         self.__auth = Auth.Auth()
 
-    # Executes a model object's function
+    # Dynamically executes a model object's function
     # @param token must be valid in order to execute the function
     # @param params is a dictionary of parameters to pass to the model's function
     def execute_model_logic(self, token, user_id, model, function_name, params):
@@ -35,7 +35,7 @@ class AppController:
         model_func_param_list = list(inspect.signature(getattr(model, func_name)).parameters)
         for param_name in model_func_param_list:
             params.update({param_name: request_body.get(param_name)})
-        # all request bodies are required to come with a token and a user_id
+        # all request bodies come with a token and a user_id (except GET requests b/c they have no body)
         token = request_body.get("token")
         user_id = request_body.get("user_id")
         return dict(token=token, user_id=user_id, params=params)

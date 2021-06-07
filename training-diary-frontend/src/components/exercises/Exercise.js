@@ -5,6 +5,7 @@ import { Container, Row, Col, Button, Spinner, Tabs, Tab, Card, Alert, Form, Dro
 import FatalError from '../generic/FatalError.js';
 import ExerciseModal from './ExerciseModal.js';
 import EntryModal from './EntryModal.js';
+import Insights from '../generic/Insights.js';
 
 import '../../styles/exercise.css';
 
@@ -157,7 +158,12 @@ const Exercise = (props) => {
     }
     const callback = (res) => {
       if(res.status == 200) {
-        setEntries(res.data.data);
+        var temp = res.data.data;
+        // sort descending by timestamp
+        temp.sort((ele1, ele2) => {
+          return ele2.timestamp - ele1.timestamp;
+        });
+        setEntries(temp);
       }
     };
     const callbackOnError = (error) => {
@@ -506,6 +512,12 @@ const Exercise = (props) => {
           }
         </Tab>
         <Tab eventKey="insights" title="Insights 📈">
+          <br/>
+          <Insights
+            model={"exercise"}
+            entries={entries}
+            exerciseLookup={exerciseLookup}
+          />
         </Tab>
       </Tabs>
       <br/>
