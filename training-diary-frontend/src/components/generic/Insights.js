@@ -1,9 +1,19 @@
 import React, { useState, useEffect } from 'react';
 
 import { Row, Col, Button, Form, ListGroup } from 'react-bootstrap';
+import { PieChart, Pie, Legend, Tooltip } from "recharts";
 
 
 const Insights = (props) => {
+
+    const data01 = [
+    { name: "Group A", value: 400 },
+    { name: "Group B", value: 300 },
+    { name: "Group C", value: 300 },
+    { name: "Group D", value: 200 },
+    { name: "Group E", value: 278 },
+    { name: "Group F", value: 189 }
+  ];
 
   const calculateMostLoggedExercises = () => {
     if(props.entries === undefined || props.entries === null) {
@@ -71,6 +81,21 @@ const Insights = (props) => {
           <div>
             <h5> Category Breakdown </h5>
             <small> <i> From logged exercises </i> </small>
+          </div>
+          <div>
+            <PieChart width={1000} height={400}>
+              <Pie
+                dataKey="value"
+                isAnimationActive={false}
+                data={data01}
+                cx={200}
+                cy={200}
+                outerRadius={80}
+                fill="#8884d8"
+                label
+              />
+              <Tooltip />
+            </PieChart>
           </div>
         </Col>
       </Row>
