@@ -4,21 +4,24 @@ services:
     build: training-diary-backend
     ports:
       - "5000:5000"
-    depends_on:
-      - mongo
-    links:
-      - mongo
   mongo:
     image: mongo
     ports:
       - "27017:27017"
     environment:
       - MONGODB_ROOT_PASSWORD=password123
-      # MONGO_INITDB_ROOT_USERNAME: root
-      # MONGO_INITDB_ROOT_PASSWORD: password
     volumes:
       - mongo-data:/data/db
       - mongo-configdb:/data/configdb
+  react:
+    build: training-diary-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_DEV_API_HOST=http://localhost:5000
+    volumes:
+      - ./training-diary-frontend/src:/usr/src/app/src
+      - ./training-diary-frontend/public:/usr/src/app/public
 volumes:
   mongo-data:
   mongo-configdb:
