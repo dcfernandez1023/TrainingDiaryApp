@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react';
 
-import { Row, Col, Button, Form, ListGroup } from 'react-bootstrap';
-import { PieChart, Pie, Legend, Tooltip } from "recharts";
+import { Row, Col, Button, Form, ListGroup, Card } from 'react-bootstrap';
+import { PieChart, Pie, Legend, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import distinctColors from 'distinct-colors';
+
+import '../../styles/insights.css';
 
 
 const Insights = (props) => {
-
-    const data01 = [
-    { name: "Group A", value: 400 },
-    { name: "Group B", value: 300 },
-    { name: "Group C", value: 300 },
-    { name: "Group D", value: 200 },
-    { name: "Group E", value: 278 },
-    { name: "Group F", value: 189 }
+  const COLORS = [
+    "ForestGreen",
+    "BlueViolet",
+    "Chocolate",
+    "Crimson",
+    "DarkSalmon",
+    "DarkSeaGreen"
   ];
 
   const calculateMostLoggedExercises = () => {
@@ -51,6 +53,7 @@ const Insights = (props) => {
       alert("Could not calculate most logged exercises.");
       return [];
     }
+    var breakdown = [];
     var breakdownCount = {};
     for(var i = 0; i < props.entries.length; i++) {
       var entry = props.entries[i];
@@ -61,42 +64,63 @@ const Insights = (props) => {
         breakdownCount[props.exerciseLookup[entry.exercise_id].category]++;
       }
     }
-    console.log(breakdownCount);
+    for(var key in breakdownCount) {
+      var obj = {name: key, value: breakdownCount[key]};
+      breakdown.push(obj);
+    }
+    return breakdown;
   }
 
   if(props.model === "exercise") {
-    calculateExerciseCategoryBreakdown();
+    const listData = calculateMostLoggedExercises();
+    const pieData = calculateExerciseCategoryBreakdown();
     return (
       <Row>
         <Col lg={6}>
-          <h5> Most Logged Exercises </h5>
-          {calculateMostLoggedExercises().map((element) => {
-            var exercise = props.exerciseLookup[element.exercise_id];
-            return (
-              <div> {exercise.name} - {exercise.sets} x {exercise.reps} @ {exercise.amount} : {element.count} </div>
-            );
-          })}
+          <Card className="card-equal-height">
+            <Card.Header> Most Logged Exercises </Card.Header>
+            <Card.Body>
+              <ListGroup variant="flush">
+              {listData.map((element) => {
+                var exercise = props.exerciseLookup[element.exercise_id];
+                return (
+                  <ListGroup.Item>
+                    {exercise.name} - {exercise.sets} x {exercise.reps} @ {exercise.amount} : {element.count}
+                  </ListGroup.Item>
+                );
+              })}
+              </ListGroup>
+            </Card.Body>
+          </Card>
         </Col>
         <Col lg={6}>
-          <div>
-            <h5> Category Breakdown </h5>
-            <small> <i> From logged exercises </i> </small>
-          </div>
-          <div>
-            <PieChart width={1000} height={400}>
-              <Pie
-                dataKey="value"
-                isAnimationActive={false}
-                data={data01}
-                cx={200}
-                cy={200}
-                outerRadius={80}
-                fill="#8884d8"
-                label
-              />
-              <Tooltip />
-            </PieChart>
-          </div>
+          <Card className="card-equal-height">
+            <Card.Header>
+              Category Breakdown <small> (<i>From exercise logs</i>) </small>
+            </Card.Header>
+            <Card.Body>
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart style={{textAlign: "center"}}>
+                  <Pie
+                    dataKey="value"
+                    isAnimationActive={false}
+                    data={pieData}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    label
+                  >
+                    {
+                      pieData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index]}/>
+                      ))
+                    }
+                  </Pie>
+                  <Legend verticalAlign="top"/>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </Card.Body>
+          </Card>
         </Col>
       </Row>
     );

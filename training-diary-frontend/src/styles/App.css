@@ -39,6 +39,7 @@
 
 .parent-div {
   background-color: white;
+  overflow-x: hidden;
 }
 
 .spinner-align {
