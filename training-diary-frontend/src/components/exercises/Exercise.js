@@ -254,6 +254,9 @@ const Exercise = (props) => {
   }
 
   const getEntryTableData = () => {
+    if(entries === undefined || exercises === undefined || exerciseLookup === undefined) {
+      return [];
+    }
     var rows = [];
     for(var i = 0; i < entries.length; i++) {
       var row = {};
@@ -456,51 +459,6 @@ const Exercise = (props) => {
         </Tab>
         <Tab eventKey="logs" title="Logs 📝">
           <br/>
-          <Row>
-            <Col md={6}>
-              <InputGroup>
-                <InputGroup.Prepend>
-                  <InputGroup.Text> Search </InputGroup.Text>
-                </InputGroup.Prepend>
-                <Form.Control
-                  as="input"
-                />
-              </InputGroup>
-            </Col>
-            <Col md={2}></Col>
-            <Col md={4} className="right-align">
-              <InputGroup>
-                <InputGroup.Prepend>
-                  <InputGroup.Text> Sort By </InputGroup.Text>
-                </InputGroup.Prepend>
-                <Form.Control
-                  as="select"
-                  onChange={(e) => {
-                    var value = e.target.value;
-                    if(value === "recent") {
-                      sortEntriesDescending();
-                    }
-                    else if(value === "oldest") {
-                      sortEntriesAscending();
-                    }
-                  }}
-                >
-                  <option value="recent" selected> Most Recent </option>
-                  <option value="oldest"> Oldest </option>
-                </Form.Control>
-              </InputGroup>
-            </Col>
-            {/*
-            <Col xs={6} className="edit-delete-table-align">
-            {editingTable ?
-              <Button variant="outline-dark" className="edit-delete-table-buttons" onClick={() => {setEditingTable(false)}}> ✔️ </Button>
-            :
-              <Button variant="outline-dark" className="edit-delete-table-buttons" onClick={() => {setEditingTable(true)}}> ✏️ </Button>
-            }
-            </Col>
-            */}
-          </Row>
-          <br/>
           {entries.length == 0 ?
             <p className="no-exercises-align"> You have not logged any exercises </p>
           :
@@ -508,6 +466,8 @@ const Exercise = (props) => {
               columns={TABLE_COLUMNS}
               rows={getEntryTableData()}
               onClickDelete={openEntryModal}
+              sortRecent={sortEntriesDescending}
+              sortOldest={sortEntriesAscending}
             />
           }
         </Tab>
