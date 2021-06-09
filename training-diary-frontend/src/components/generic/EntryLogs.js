@@ -22,16 +22,13 @@ const EntryLogs = (props) => {
   */
   const getEndIndex = (string, searchString, startIndex) => {
     var n = 0;
-    for(var i = startIndex; i < string.length; i++) {
-      // ensure we don't go out of bounds
-      if(n >= searchString.length) {
-        break;
-      }
-      if(string.charAt(i) === searchString.charAt(n)) {
-        n++;
+    var i;
+    for(i = startIndex; i < string.length; i++) {
+      if(string.charAt(i) !== searchString.charAt(n++)) {
+        return i-1;
       }
     }
-    return n-1;
+    return i-1;
   }
 
   /* Filters the table rows based on the user's search */
@@ -70,7 +67,6 @@ const EntryLogs = (props) => {
     }
     setShowSpinner(false);
     setFiltered(filteredRows);
-    console.log(filteredRows);
   }
 
   /* Helper function to highlight the searched portion of the text */
@@ -78,9 +74,24 @@ const EntryLogs = (props) => {
     if(start === undefined || end === undefined) {
       return text;
     }
-    var beforeStart = text.substr(0, start);
-    var highlight = text.substr(start, end - start + 1);
-    var afterEnd = text.substr(end + 1);
+    console.log("Start: " + start);
+    console.log("End: " + end);
+    console.log("Text: " + text);
+    var beforeStart = "";
+    var highlight = "";
+    var afterEnd = "";
+    for(var i = 0; i < start; i++) {
+      beforeStart += text.charAt(i);
+    }
+    for(var i = start; i <= end; i++) {
+      highlight += text.charAt(i);
+    }
+    for(var i = end + 1; i < text.length; i++) {
+      afterEnd += text.charAt(i);
+    }
+    // var beforeStart = text.substr(0, start - 1);
+    // var highlight = text.substr(start, end);
+    // var afterEnd = text.substr(end + 1);
     return <div>{beforeStart}<mark>{highlight}</mark>{afterEnd}</div>;
   }
 
@@ -157,6 +168,7 @@ const EntryLogs = (props) => {
           })
           :
           filtered.map((row) => {
+            console.log("---------------------------------");
             return (
               <tr>
                 <td>
