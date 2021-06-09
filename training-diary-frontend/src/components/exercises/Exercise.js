@@ -6,6 +6,7 @@ import FatalError from '../generic/FatalError.js';
 import ExerciseModal from './ExerciseModal.js';
 import EntryModal from './EntryModal.js';
 import Insights from '../generic/Insights.js';
+import EntryLogs from '../generic/EntryLogs.js';
 
 import '../../styles/exercise.css';
 
@@ -29,6 +30,12 @@ const Exercise = (props) => {
   const [modalType, setModalType] = useState("");
   const [modalEntry, setModalEntry] = useState();
   const [editingTable, setEditingTable] = useState(false);
+
+  const TABLE_COLUMNS = [
+    "Date",
+    "Exercise Performed",
+    "Notes"
+  ];
 
   useEffect(() => {
     getExercises();
@@ -230,6 +237,40 @@ const Exercise = (props) => {
     CONTROLLER.deleteEntry(token, user_id, exercise_entry_id, callback, callbackOnError);
   }
 
+  const sortEntriesAscending = () => {
+    var copy = entries.slice();
+    copy.sort((ele1, ele2) => {
+      return ele1.timestamp - ele2.timestamp;
+    });
+    setEntries(copy);
+  }
+
+  const sortEntriesDescending = () => {
+    var copy = entries.slice();
+    copy.sort((ele1, ele2) => {
+      return ele2.timestamp - ele1.timestamp;
+    });
+    setEntries(copy);
+  }
+
+  const getEntryTableData = () => {
+    var rows = [];
+    for(var i = 0; i < entries.length; i++) {
+      var row = {};
+      var data = [];
+      var entry = entries[i];
+      var exercise = exerciseLookup[entry.exercise_id];
+      var exercisePerformed = exercise.name + " | " + exercise.category + " | " + exercise.sets + " x " + exercise.reps + " @ " + exercise.amount + " " + exercise.units;
+      data.push({key: "timestamp", value: entry.timestamp});
+      data.push({key: "exercisePerformed", value: exercisePerformed});
+      data.push({key: "notes", value: entry.notes});
+      row.entry = entry;
+      row.data = data;
+      rows.push(row);
+    }
+    return rows;
+  }
+
   const openAddModal = () => {
     setAddShow(true);
     setModalHeader("Add Exercise");
@@ -289,14 +330,13 @@ const Exercise = (props) => {
     setModalExercise();
   }
 
-  const openEntryModal = (type, entry, exercise) => {
+  const openEntryModal = (type, entry) => {
     setEntryShow(true);
     if(type === "delete") {
-      console.log(entry);
       setModalHeader("Delete Log");
       setModalType(type);
       setModalEntry(entry);
-      setModalExercise(exercise);
+      setModalExercise(exerciseLookup[entry.exercise_id]);
     }
     else {
       setModalHeader("Log Exercise");
@@ -417,18 +457,38 @@ const Exercise = (props) => {
         <Tab eventKey="logs" title="Logs 📝">
           <br/>
           <Row>
-            <Col xs={6}>
+            <Col md={6}>
               <InputGroup>
+                <InputGroup.Prepend>
+                  <InputGroup.Text> Search </InputGroup.Text>
+                </InputGroup.Prepend>
                 <Form.Control
                   as="input"
                 />
-                <InputGroup.Append>
-                  <Button variant="info"> Search </Button>
-                </InputGroup.Append>
               </InputGroup>
             </Col>
-            <Col xs={6} className="right-align">
-              <DropdownButton variant="info" title="Sort By" className="sort-by-button"> </DropdownButton>
+            <Col md={2}></Col>
+            <Col md={4} className="right-align">
+              <InputGroup>
+                <InputGroup.Prepend>
+                  <InputGroup.Text> Sort By </InputGroup.Text>
+                </InputGroup.Prepend>
+                <Form.Control
+                  as="select"
+                  onChange={(e) => {
+                    var value = e.target.value;
+                    if(value === "recent") {
+                      sortEntriesDescending();
+                    }
+                    else if(value === "oldest") {
+                      sortEntriesAscending();
+                    }
+                  }}
+                >
+                  <option value="recent" selected> Most Recent </option>
+                  <option value="oldest"> Oldest </option>
+                </Form.Control>
+              </InputGroup>
             </Col>
             {/*
             <Col xs={6} className="edit-delete-table-align">
@@ -444,71 +504,11 @@ const Exercise = (props) => {
           {entries.length == 0 ?
             <p className="no-exercises-align"> You have not logged any exercises </p>
           :
-            <Table responsive bordered>
-              <thead>
-              {editingTable ?
-                <th> # </th>
-              :
-                <div></div>
-              }
-                <th> # </th>
-                <th> Date </th>
-                <th> Exercise Performed </th>
-                <th> Notes </th>
-              </thead>
-              <tbody>
-              {entries.map((entry) => {
-                var exercise = exerciseLookup[entry.exercise_id];
-                return (
-                  <tr
-                    id={entry.exercise_entry_id}
-                    key={entry.exercise_entry_id}
-                    action
-                  >
-                  {editingTable ?
-                    <td>
-                      <Button variant="outline-dark" size="sm"> 🗑️ </Button>
-                    </td>
-                  :
-                    <div></div>
-                  }
-                    <td className="log-column-1">
-                      <Button variant="outline-dark" size="sm" onClick={() => openEntryModal("delete", entry, exerciseLookup[entry.exercise_id])}> 🗑️ </Button>
-                    </td>
-                    <td className="log-column-2">
-                    {editingTable ?
-                      <Form.Control
-                        as="input"
-                        type="date"
-                        value={new Date(entry.timestamp).toISOString().slice(0, 10)}
-                      />
-                    :
-                      new Date(entry.timestamp).toLocaleDateString()
-                    }
-                    </td>
-                    <td className="log-column-3">
-                    {exercise === undefined ?
-                      ""
-                    :
-                      exercise.name + " | " + exercise.category + " | " + exercise.sets + " x " + exercise.reps + " @ " + exercise.amount + " " + exercise.units
-                    }
-                    </td>
-                    <td className="log-column-4">
-                    {editingTable ?
-                      <Form.Control
-                        as="textarea"
-                        rows="2"
-                        value={entry.notes}
-                      />
-                    :
-                      entry.notes
-                    }
-                    </td>
-                  </tr>
-                );
-              })}
-              </tbody>
-            </Table>
+            <EntryLogs
+              columns={TABLE_COLUMNS}
+              rows={getEntryTableData()}
+              onClickDelete={openEntryModal}
+            />
           }
         </Tab>
         <Tab eventKey="insights" title="Insights 📈">

@@ -83,6 +83,10 @@
   width: 40%;
 }
 
+.sort-width {
+  width: 30px;
+}
+
 .table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
 
 }
