@@ -136,13 +136,21 @@ const Exercise = (props) => {
       if(res.status == 200) {
         var copy = exercises.slice();
         var copyEntries = [];
+        // delete exercise from exercise list
         for(var i = 0; i < copy.length; i++) {
           if(res.data.data === copy[i].exercise_id) {
             copy.splice(i, 1);
             break;
           }
         }
+        // delete entries associated with deleted exercise
+        for(var i = 0; i < entries.length; i++) {
+          if(res.data.data !== entries[i].exercise_id) {
+            copyEntries.push(entries[i]);
+          }
+        }
         setExercises(copy);
+        setEntries(copyEntries);
         generateExerciseLookup(copy);
       }
       modalCallback();
@@ -263,6 +271,9 @@ const Exercise = (props) => {
       var data = [];
       var entry = entries[i];
       var exercise = exerciseLookup[entry.exercise_id];
+      if(exercise === undefined) {
+        continue;
+      }
       var exercisePerformed = exercise.name + " | " + exercise.category + " | " + exercise.sets + " x " + exercise.reps + " @ " + exercise.amount + " " + exercise.units;
       data.push({key: "timestamp", value: entry.timestamp});
       data.push({key: "exercisePerformed", value: exercisePerformed});

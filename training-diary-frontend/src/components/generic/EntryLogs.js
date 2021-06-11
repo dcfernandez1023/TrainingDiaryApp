@@ -15,6 +15,11 @@ const EntryLogs = (props) => {
   const [searching, setSearching] = useState(false);
   const [filtered, setFiltered] = useState([]);
   const [showSpinner, setShowSpinner] = useState(false);
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    filterSearch(search);
+  }, [props.rows]);
 
   /*
     * Helper function to get the end index of the substring with in @param string.
@@ -74,9 +79,6 @@ const EntryLogs = (props) => {
     if(start === undefined || end === undefined) {
       return text;
     }
-    console.log("Start: " + start);
-    console.log("End: " + end);
-    console.log("Text: " + text);
     var beforeStart = "";
     var highlight = "";
     var afterEnd = "";
@@ -89,9 +91,6 @@ const EntryLogs = (props) => {
     for(var i = end + 1; i < text.length; i++) {
       afterEnd += text.charAt(i);
     }
-    // var beforeStart = text.substr(0, start - 1);
-    // var highlight = text.substr(start, end);
-    // var afterEnd = text.substr(end + 1);
     return <div>{beforeStart}<mark>{highlight}</mark>{afterEnd}</div>;
   }
 
@@ -105,7 +104,10 @@ const EntryLogs = (props) => {
             </InputGroup.Prepend>
             <Form.Control
               as="input"
-              onChange={(e) => {filterSearch(e.target.value)}}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                filterSearch(e.target.value);
+              }}
             />
           </InputGroup>
         </Col>
@@ -168,7 +170,6 @@ const EntryLogs = (props) => {
           })
           :
           filtered.map((row) => {
-            console.log("---------------------------------");
             return (
               <tr>
                 <td>

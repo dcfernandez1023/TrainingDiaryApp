@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-import { Row, Col, Button, Form, ListGroup, Card } from 'react-bootstrap';
+import { Row, Col, Button, Form, ListGroup, Card, Table } from 'react-bootstrap';
 import { PieChart, Pie, Legend, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import distinctColors from 'distinct-colors';
 
@@ -71,6 +71,14 @@ const Insights = (props) => {
     return breakdown;
   }
 
+  if(props.entries === undefined) {
+    return <div></div>;
+  }
+  if(props.entries.length === 0) {
+    return (
+      <div className="center-align"> You have no data to be analyzed </div>
+    );
+  }
   if(props.model === "exercise") {
     const listData = calculateMostLoggedExercises();
     const pieData = calculateExerciseCategoryBreakdown();
@@ -78,11 +86,35 @@ const Insights = (props) => {
       <Row>
         <Col lg={6}>
           <Card className="card-equal-height">
-            <Card.Header> Most Logged Exercises </Card.Header>
+            <Card.Header> Frequently Performed Exercises </Card.Header>
             <Card.Body>
+              <Table>
+                <thead>
+                  <th> Exercise </th>
+                  <th> # of Times Performed </th>
+                </thead>
+                <tbody>
+                  {listData.map((element) => {
+                    var exercise = props.exerciseLookup[element.exercise_id];
+                    if(exercise === undefined) {
+                      return <div></div>;
+                    }
+                    return (
+                      <tr>
+                        <td> {exercise.name} - {exercise.sets} x {exercise.reps} @ {exercise.amount} {exercise.units} </td>
+                        <td className="center-align"> {element.count} </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </Table>
+              {/*
               <ListGroup variant="flush">
               {listData.map((element) => {
                 var exercise = props.exerciseLookup[element.exercise_id];
+                if(exercise === undefined) {
+                  return <div></div>;
+                }
                 return (
                   <ListGroup.Item>
                     {exercise.name} - {exercise.sets} x {exercise.reps} @ {exercise.amount} : {element.count}
@@ -90,6 +122,7 @@ const Insights = (props) => {
                 );
               })}
               </ListGroup>
+              */}
             </Card.Body>
           </Card>
         </Col>

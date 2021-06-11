@@ -97,17 +97,17 @@ const EntryModal = (props) => {
         <Modal.Body>
           <Row>
             <Col>
-              {new Date(entry.timestamp).toLocaleDateString()}
+              {entry === undefined ? "" : new Date(entry.timestamp).toLocaleDateString()}
             </Col>
           </Row>
           <Row>
             <Col>
-              {exercise.name + " | " + exercise.category + " | " + exercise.sets + " x " + exercise.reps + " @ " + exercise.amount + " " + exercise.units}
+              {exercise === undefined ? "" : exercise.name + " | " + exercise.category + " | " + exercise.sets + " x " + exercise.reps + " @ " + exercise.amount + " " + exercise.units}
             </Col>
           </Row>
           <Row>
             <Col>
-              <i> {entry.notes} </i>
+              <i> {entry === undefined ? "" : entry.notes} </i>
             </Col>
           </Row>
         </Modal.Body>

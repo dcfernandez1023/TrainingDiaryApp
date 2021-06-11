@@ -41,7 +41,8 @@ export const metaData = [
     "kgs.",
     "miles",
     "meters",
-    "kilometers"
+    "kilometers",
+    "None"
   ]),
   new ExerciseMetaData("description", "string", "textarea", "Description", false, 12, [])
 ];
