@@ -1,3 +1,5 @@
+import ModelMetaData from './ModelMetaData.js';
+
 export const exerciseEntry = {
   "exercise_entry_id": "",
   "exercise_id": "",
@@ -9,25 +11,13 @@ export const exerciseEntry = {
   "notes": "",
 };
 
-class EntryMetaData {
-  constructor(value, type, element, display, required, colSpace, options) {
-    this.value = value;
-    this.type = type;
-    this.element = element;
-    this.display = display;
-    this.required = required;
-    this.colSpace = colSpace;
-    this.options = options;
-  }
-}
-
 export const metaData = [
-  new EntryMetaData("exercise_entry_id", "string", undefined, "", false, 0, []),
-  new EntryMetaData("exercise_id", "string", undefined, "", false, 0, []),
-  new EntryMetaData("user_id", "string", undefined, "", false, 0, []),
-  new EntryMetaData("timestamp", "number", undefined, "", true, 0, []),
-  new EntryMetaData("day", "number", undefined, "", true, 0, []),
-  new EntryMetaData("month", "number", undefined, "", true, 0, []),
-  new EntryMetaData("year", "number", undefined, "", true, 0, []),
-  new EntryMetaData("notes", "string", undefined, "", false, 0, []),
+  new ModelMetaData("exercise_entry_id", "string", undefined, "", false, 0, []),
+  new ModelMetaData("exercise_id", "string", undefined, "", false, 0, []),
+  new ModelMetaData("user_id", "string", undefined, "", false, 0, []),
+  new ModelMetaData("timestamp", "number", undefined, "", true, 0, []),
+  new ModelMetaData("day", "number", undefined, "", true, 0, []),
+  new ModelMetaData("month", "number", undefined, "", true, 0, []),
+  new ModelMetaData("year", "number", undefined, "", true, 0, []),
+  new ModelMetaData("notes", "string", undefined, "", false, 0, []),
 ];

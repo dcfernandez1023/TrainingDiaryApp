@@ -11,6 +11,7 @@ const MODEL = require('../../models/exercise.js');
     * show
     * header
     * exercise
+    * type
     * onClose
     * onSubmitModal
 */

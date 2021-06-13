@@ -18,4 +18,20 @@ export const getDietEntries = (token, user_id, callback, callbackOnError) => {
     }, (error) => {
       callbackOnError(error);
     });
+  }
+
+// create diet entry
+export const createDiet = (token, user_id, diet, callback, callbackOnError) => {
+  var endpoint = BASE_URL + BASE + "/create";
+  var body = {
+    token: token,
+    user_id: user_id,
+    data: diet
+  };
+  axios.post(endpoint, body)
+    .then((res) => {
+      callback(res);
+    }, (error) => {
+      callbackOnError(error);
+    });
 }

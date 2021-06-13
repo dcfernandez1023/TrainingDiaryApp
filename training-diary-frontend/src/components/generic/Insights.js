@@ -2,11 +2,16 @@ import React, { useState, useEffect } from 'react';
 
 import { Row, Col, Button, Form, ListGroup, Card, Table } from 'react-bootstrap';
 import { PieChart, Pie, Legend, Cell, Tooltip, ResponsiveContainer } from "recharts";
-import distinctColors from 'distinct-colors';
 
 import '../../styles/insights.css';
 
 
+/*
+  Props:
+    * entries
+    * model - the model object to render insights for
+    * exerciseLookup - to get exercises from entries in O(1)
+*/
 const Insights = (props) => {
   const COLORS = [
     "ForestGreen",
@@ -160,7 +165,7 @@ const Insights = (props) => {
   }
   else {
     return (
-      <h5> Could not generate insights - No such type '{props.model === undefined || props.model === null ? "undefined" : props.model.toString()}' </h5>
+      <h5> Could not generate insights - No such type {props.model === undefined || props.model === null ? "undefined" : props.model.toString()} </h5>
     );
   }
 }

@@ -56,6 +56,7 @@ const EntryLogs = (props) => {
         if(row.data[n].key === "timestamp") {
           value = new Date(value).toLocaleDateString();
         }
+        value = value.toString();
         var startIndex = value.indexOf(searchString);
         if(startIndex != -1) {
           var endIndex = getEndIndex(value, searchString, startIndex);
