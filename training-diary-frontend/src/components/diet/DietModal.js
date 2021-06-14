@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Button, Spinner, Form, Modal } from 'react-bootstrap';
 
 const MODEL = require('../../models/diet.js');
+const UTIL = require('../../util/util.js');
 
 
 /*
@@ -90,7 +91,9 @@ const DietModal = (props) => {
                 id="diet-date"
                 as="input"
                 type="date"
+                defaultValue={diet === undefined || diet.timestamp === 0 ? "" : UTIL.formatDate(diet.timestamp)}
                 required
+                disabled={type === "delete"}
               />
             </Col>
             <Col xs={2}></Col>

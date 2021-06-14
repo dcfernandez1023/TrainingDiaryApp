@@ -47,7 +47,11 @@ class Diet:
             # If there has already been a diet entry entered on a given date, then update it instead of creating
             # a new one
             if len(entry_today) == 1:
-                self.__db.update_one({"diet_id": entry_today["diet_id"]}, data, self.__collection)
+                data["diet_id"] = entry_today[0]["diet_id"]
+                if len(entry_today[0]["notes"].strip()) > 0:
+                    data["notes"] = entry_today[0]["notes"] + " | " + data["notes"]
+                data["user_id"] = user_id
+                self.__db.update_one({"diet_id": entry_today[0]["diet_id"]}, data, self.__collection)
                 return data
             # Otherwise, create a new entry
             elif len(entry_today) > 1:

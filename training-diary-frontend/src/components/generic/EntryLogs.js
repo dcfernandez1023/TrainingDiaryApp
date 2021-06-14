@@ -80,6 +80,7 @@ const EntryLogs = (props) => {
     if(start === undefined || end === undefined) {
       return text;
     }
+    text = text.toString();
     var beforeStart = "";
     var highlight = "";
     var afterEnd = "";

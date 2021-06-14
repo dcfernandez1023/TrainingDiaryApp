@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-import { Container, Row, Col, Button, Tabs, Tab } from 'react-bootstrap';
+import { Container, Row, Col, Button, Tabs, Tab, Spinner } from 'react-bootstrap';
 
 import DietModal from './DietModal.js';
 import Insights from '../generic/Insights.js';
@@ -17,6 +17,7 @@ const Diet = (props) => {
   const [fatalMsg, setFatalMsg] = useState("");
   const [entries, setEntries] = useState();
   const [addShow, setAddShow] = useState(false);
+  const [deleteShow, setDeleteShow] = useState(false);
   const [modalHeader, setModalHeader] = useState("");
   const [modalDiet, setModalDiet] = useState();
   const [modalType, setModalType] = useState("");
@@ -60,8 +61,18 @@ const Diet = (props) => {
     }
     const callback = (res) => {
       if(res.status == 200) {
+        var isUpdate = false;
         var copy = entries.slice();
-        copy.push(res.data.data);
+        for(var i = 0; i < copy.length; i++) {
+          if(copy[i].diet_id === res.data.data.diet_id) {
+            copy[i] = res.data.data;
+            isUpdate = true;
+            break;
+          }
+        }
+        if(!isUpdate) {
+          copy.push(res.data.data);
+        }
         setEntries(copy);
       }
       modalCallback();
@@ -74,6 +85,35 @@ const Diet = (props) => {
     CONTROLLER.createDiet(token, user_id, diet, callback, callbackOnError);
   }
 
+  const deleteDiet = (diet, modalCallback) => {
+    var token = LOCAL_STORAGE.getStorageItem("TRAINING_DIARY_API_TOKEN");
+    var user_id = LOCAL_STORAGE.getStorageItem("TRAINING_DIARY_USER");
+    if(token === null || token === undefined || user_id === null || user_id === undefined) {
+      //TODO: if token cannot be pulled from localstorage, log the user out
+      alert("Could not get token");
+      return;
+    }
+    const callback = (res) => {
+      if(res.status == 200) {
+        var copy = entries.slice();
+        for(var i = 0; i < copy.length; i++) {
+          if(copy[i].diet_id === res.data.data) {
+            copy.splice(i, 1);
+            break;
+          }
+        }
+        setEntries(copy);
+        modalCallback();
+      }
+    };
+    const callbackOnError = (error) => {
+      modalCallback();
+      setIsFatal(true);
+      setFatalMsg(error.response.data.message);
+    }
+    CONTROLLER.deleteDiet(token, user_id, diet.diet_id, callback, callbackOnError);
+  }
+
   const openAddModal = () => {
     var diet = Object.assign({}, MODEL.diet);
     setModalDiet(diet);
@@ -82,11 +122,19 @@ const Diet = (props) => {
     setModalType("add");
   }
 
-  const onCloseAddModal = () => {
+  const onCloseModal = () => {
     setAddShow(false);
+    setDeleteShow(false);
     setModalDiet();
     setModalHeader("");
     setModalType("");
+  }
+
+  const openDeleteModal = (type, diet) => {
+    setModalDiet(diet);
+    setDeleteShow(true);
+    setModalHeader("Delete Diet");
+    setModalType("delete");
   }
 
   const calculateTableData = () => {
@@ -98,10 +146,16 @@ const Diet = (props) => {
       var row = {};
       var data = [];
       var entry = entries[i];
+      var macros = ["protein", "carbs", "fat"];
       for(var n = 0; n < MODEL.metaData.length; n++) {
         if(MODEL.metaData[n].required) {
           var key = MODEL.metaData[n].value;
-          data.push({key: key, value: entry[key]});
+          if(macros.includes(MODEL.metaData[n].value)) {
+            data.push({key: key, value: entry[key] + "g"});
+          }
+          else {
+            data.push({key: key, value: entry[key]});
+          }
         }
       }
       // push notes, since it's not required but it should be shown
@@ -129,6 +183,15 @@ const Diet = (props) => {
     setEntries(copy);
   }
 
+  if(entries === undefined) {
+    return (
+      <Row>
+        <Col className="spinner-align">
+          <Spinner animation="grow"/>
+        </Col>
+      </Row>
+    );
+  }
   if(isFatal) {
     return (
       <FatalError
@@ -139,12 +202,12 @@ const Diet = (props) => {
   return (
     <Container>
       <DietModal
-        show={addShow}
+        show={addShow ? addShow : deleteShow ? deleteShow : false}
         header={modalHeader}
         diet={modalDiet}
         type={modalType}
-        onSubmitModal={createDiet}
-        onClose={onCloseAddModal}
+        onSubmitModal={addShow ? createDiet : deleteShow ? deleteDiet : undefined}
+        onClose={onCloseModal}
       />
       <Row>
       <Col xs={10}>
@@ -158,12 +221,17 @@ const Diet = (props) => {
       <Tabs defaultActiveKey="logs">
         <Tab eventKey="logs" title="Logs 📝">
           <br/>
-          <EntryLogs
-            columns={["Date", "Calories", "Proteins", "Fats", "Carbs", "Notes"]}
-            rows={calculateTableData()}
-            sortRecent={sortEntriesDescending}
-            sortOldest={sortEntriesAscending}
-          />
+          {entries.length === 0 ?
+            <p className="center-align"> You have no diet data </p>
+            :
+            <EntryLogs
+              columns={["Date", "Calories", "Proteins", "Fats", "Carbs", "Notes"]}
+              rows={calculateTableData()}
+              sortRecent={sortEntriesDescending}
+              sortOldest={sortEntriesAscending}
+              onClickDelete={openDeleteModal}
+            />
+          }
         </Tab>
         <Tab eventKey="insights" title="Insights 📈">
           <br/>

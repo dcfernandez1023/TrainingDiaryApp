@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import { Row, Col, Button, Form, ListGroup, Card, Table } from 'react-bootstrap';
-import { PieChart, Pie, Legend, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, PieChart, Pie, Legend, Cell, Tooltip, ResponsiveContainer } from "recharts";
 
 import '../../styles/insights.css';
 
@@ -20,6 +20,51 @@ const Insights = (props) => {
     "Crimson",
     "DarkSalmon",
     "DarkSeaGreen"
+  ];
+
+  const data = [
+    {
+      name: 'Page A',
+      uv: 4000,
+      pv: 2400,
+      amt: 2400,
+    },
+    {
+      name: 'Page B',
+      uv: 3000,
+      pv: 1398,
+      amt: 2210,
+    },
+    {
+      name: 'Page C',
+      uv: 2000,
+      pv: 9800,
+      amt: 2290,
+    },
+    {
+      name: 'Page D',
+      uv: 2780,
+      pv: 3908,
+      amt: 2000,
+    },
+    {
+      name: 'Page E',
+      uv: 1890,
+      pv: 4800,
+      amt: 2181,
+    },
+    {
+      name: 'Page F',
+      uv: 2390,
+      pv: 3800,
+      amt: 2500,
+    },
+    {
+      name: 'Page G',
+      uv: 3490,
+      pv: 4300,
+      amt: 2100,
+    },
   ];
 
   const calculateMostLoggedExercises = () => {
@@ -76,6 +121,74 @@ const Insights = (props) => {
     return breakdown;
   }
 
+  const calculateDietAverages = () => {
+    if(props.entries === undefined || props.entries === null) {
+      //TODO: handle this more elegantly
+      alert("Could not calculate most logged exercises.");
+      return {};
+    }
+    var averages = {calories: 0, proteins: 0, carbs: 0, fats: 0};
+    for(var i = 0; i < props.entries.length; i++) {
+      var entry = props.entries[i];
+      averages.calories += entry.calories;
+      averages.proteins += entry.protein;
+      averages.carbs += entry.carbs;
+      averages.fats += entry.fat;
+    }
+    averages.calories = Math.round(averages.calories / props.entries.length);
+    averages.proteins = Math.round(averages.proteins / props.entries.length);
+    averages.carbs = Math.round(averages.carbs / props.entries.length);
+    averages.fats = Math.round(averages.fats / props.entries.length);
+    return averages;
+  }
+
+  const calculateMinAndMaxDiet = () => {
+    if(props.entries === undefined || props.entries === null) {
+      //TODO: handle this more elegantly
+      alert("Could not calculate most logged exercises.");
+      return {};
+    }
+    var maxes = {calories: 0, proteins: 0, carbs: 0, fats: 0};
+    var mins = {
+      calories: Number.MAX_SAFE_INTEGER,
+      proteins: Number.MAX_SAFE_INTEGER,
+      carbs: Number.MAX_SAFE_INTEGER,
+      fats: Number.MAX_SAFE_INTEGER
+    };
+    for(var i = 0; i < props.entries.length; i++) {
+      var entry = props.entries[i];
+      // calories
+      if(entry.calories > maxes.calories) {
+        maxes.calories = entry.calories;
+      }
+      if(entry.calories < mins.calories) {
+        mins.calories = entry.calories;
+      }
+      // proteins
+      if(entry.protein > maxes.proteins) {
+        maxes.proteins = entry.protein;
+      }
+      if(entry.protein < mins.proteins) {
+        mins.proteins = entry.protein;
+      }
+      // carbs
+      if(entry.carbs > maxes.carbs) {
+        maxes.carbs = entry.carbs;
+      }
+      if(entry.carbs < mins.carbs) {
+        mins.carbs = entry.carbs;
+      }
+      // fats
+      if(entry.fat > maxes.fats) {
+        maxes.fats = entry.fat;
+      }
+      if(entry.fat < mins.fats) {
+        mins.fats = entry.fat;
+      }
+    }
+    return {mins: mins, maxes: maxes};
+  }
+
   if(props.entries === undefined) {
     return <div></div>;
   }
@@ -113,21 +226,6 @@ const Insights = (props) => {
                   })}
                 </tbody>
               </Table>
-              {/*
-              <ListGroup variant="flush">
-              {listData.map((element) => {
-                var exercise = props.exerciseLookup[element.exercise_id];
-                if(exercise === undefined) {
-                  return <div></div>;
-                }
-                return (
-                  <ListGroup.Item>
-                    {exercise.name} - {exercise.sets} x {exercise.reps} @ {exercise.amount} : {element.count}
-                  </ListGroup.Item>
-                );
-              })}
-              </ListGroup>
-              */}
             </Card.Body>
           </Card>
         </Col>
@@ -161,6 +259,71 @@ const Insights = (props) => {
           </Card>
         </Col>
       </Row>
+    );
+  }
+  else if(props.model === "diet") {
+    var averages = calculateDietAverages();
+    var minsAndMaxes = calculateMinAndMaxDiet();
+    var mins = minsAndMaxes.mins;
+    var maxes = minsAndMaxes.maxes;
+    console.log(minsAndMaxes);
+    return (
+      <div>
+        <Row>
+          <Col>
+            Select
+          </Col>
+        </Row>
+        <br/>
+        <Row>
+          <Col lg={4}>
+            <Card className="card-spacing">
+              <Card.Header>
+                Avg. Calories and Macronutrients
+              </Card.Header>
+              <Card.Body>
+                <ListGroup variant="flush">
+                  <ListGroup.Item> <strong>Calories:</strong> {averages.calories} </ListGroup.Item>
+                  <ListGroup.Item> <strong>Proteins:</strong> {averages.proteins}g </ListGroup.Item>
+                  <ListGroup.Item> <strong>Carbs:</strong> {averages.carbs}g </ListGroup.Item>
+                  <ListGroup.Item> <strong>Fats:</strong> {averages.fats}g </ListGroup.Item>
+                </ListGroup>
+              </Card.Body>
+            </Card>
+            <Card className="card-spacing">
+              <Card.Header> Min/Max Calories and Macronutrients </Card.Header>
+              <Card.Body>
+                <ListGroup variant="flush">
+                  <ListGroup.Item> <strong>Calories:</strong> {maxes.calories} (max) | {mins.calories} (min) {averages.calories} </ListGroup.Item>
+                  <ListGroup.Item> <strong>Proteins:</strong> {averages.proteins}g </ListGroup.Item>
+                  <ListGroup.Item> <strong>Carbs:</strong> {averages.carbs}g </ListGroup.Item>
+                  <ListGroup.Item> <strong>Fats:</strong> {averages.fats}g </ListGroup.Item>
+                </ListGroup>
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col lg={8}>
+            <Card className="card-equal-height">
+              <Card.Header> Calorie and Macronutrient Graph </Card.Header>
+              <Card.Body>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={data}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey="pv" stroke="#8884d8" activeDot={{ r: 8 }} />
+                    <Line type="monotone" dataKey="uv" stroke="#82ca9d" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      </div>
     );
   }
   else {
