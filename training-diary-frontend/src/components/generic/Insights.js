@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import { Row, Col, Button, InputGroup, Form, ListGroup, Card, Table, Badge, DropdownButton, Dropdown } from 'react-bootstrap';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, PieChart, Pie, Legend, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import DateRangePicker from '@wojtekmaj/react-daterange-picker';
 
 import '../../styles/insights.css';
 
@@ -80,27 +81,68 @@ const Insights = (props) => {
     },
   ];
 
+  const applyTimeFilter = (startDate, endDate) => {
+    if(startDate === null || endDate === null) {
+      setEntries(props.entries);
+      return;
+    }
+    var startTime = startDate.getTime();
+    var endTime = endDate.getTime();
+    var filtered = [];
+    for(var i = 0; i < props.entries.length; i++) {
+      if(startTime <= props.entries[i].timestamp && props.entries[i].timestamp <= endTime) {
+        filtered.push(props.entries[i]);
+      }
+    }
+    setEntries(filtered);
+  }
+
   const onChangeDateRange = (filter) => {
     if(timeFilter.name === filter) {
       setTimeFilter({});
+      applyTimeFilter(null, null);
       return;
     }
     var startDate = new Date();
     var endDate = new Date();
     if(filter === "Last 7 Days") {
       startDate.setDate(startDate.getDate() - 7);
+      applyTimeFilter(startDate, endDate);
     }
     else if(filter === "Last Month") {
       const month = startDate.getMonth();
-      endDate.setMonth(month - 1);
-      while(endDate.getMonth() === month) {
-        endDate.setDate(endDate.getDate() - 1);
+      startDate.setMonth(month - 1);
+      while(startDate.getMonth() === month) {
+        startDate.setDate(startDate.getDate() - 1);
       }
+      applyTimeFilter(startDate, endDate);
     }
     else if(filter === "Custom") {
-
+      startDate = null;
+      endDate = null;
     }
     setTimeFilter({start: startDate, end: endDate, name: filter});
+  }
+
+  const generateDietGraphData = () => {
+    var data = [];
+    var copy = entries.slice();
+    copy.sort((ele1, ele2) => {
+      return ele1.timestamp - ele2.timestamp;
+    });
+    for(var i = 0; i < copy.length; i++) {
+      var entry = copy[i];
+      data.push(
+        {
+          name: new Date(entry.timestamp).toLocaleDateString(),
+          calories: entry.calories,
+          proteins: entry.protein,
+          carbs: entry.carbs,
+          fats: entry.fat
+        }
+      );
+    }
+    return data;
   }
 
   const calculateMostLoggedExercises = () => {
@@ -228,7 +270,7 @@ const Insights = (props) => {
   if(entries === undefined) {
     return <div></div>;
   }
-  if(entries.length === 0) {
+  if(entries.length === 0 && (timeFilter.start === null && timeFilter.end === null || Object.keys(timeFilter).length === 0)) {
     return (
       <div className="center-align"> You have no data to be analyzed </div>
     );
@@ -300,6 +342,8 @@ const Insights = (props) => {
   else if(props.model === "diet") {
     var averages = calculateDietAverages();
     var minsAndMaxes = calculateMinAndMaxDiet();
+    var graphData = generateDietGraphData();
+    console.log(graphData);
     var mins = minsAndMaxes.mins;
     var maxes = minsAndMaxes.maxes;
     const dataPoints = [
@@ -317,31 +361,30 @@ const Insights = (props) => {
               :
               <div>
                 {timeFilter.name === "Custom" ?
-                  <InputGroup size="sm">
-                      <span> Showing data from: </span>
-                      <InputGroup.Prepend className="diet-custom-spacing">
-                        <InputGroup.Text> Start </InputGroup.Text>
-                      </InputGroup.Prepend>
-                      <Form.Control
-                        as="input"
-                        type="date"
-                      />
-                      <span className="diet-custom-spacing"> To </span>
-                      <InputGroup.Prepend className="diet-custom-spacing">
-                        <InputGroup.Text> End </InputGroup.Text>
-                      </InputGroup.Prepend>
-                      <Form.Control
-                        as="input"
-                        type="date"
-                      />
-                  </InputGroup>
+                <div>
+                  <span> Showing Data From: </span>
+                  <DateRangePicker
+                    onChange={(dates) => {
+                      if(dates === null) {
+                        setTimeFilter({start: null, end: null, name: "Custom"});
+                        applyTimeFilter(null, null);
+                      }
+                      else {
+                        setTimeFilter({start: dates[0], end: dates[1], name: "Custom"});
+                        applyTimeFilter(dates[0], dates[1]);
+                      }
+                    }}
+                    value={[timeFilter.start, timeFilter.end]}
+                    className="diet-custom-spacing"
+                  />
+                </div>
                 :
                   <div> Showing data from: <Badge pills variant="dark"> {timeFilter.name} </Badge> </div>
                 }
               </div>
             }
           </Col>
-          <Col className="right-align column-margin-spacing" md={5}>
+          <Col className="right-align" md={5}>
             <DropdownButton title="Date Range" variant="info">
               {TIME_FILTERS.map((filter) => {
                 return (
@@ -352,6 +395,13 @@ const Insights = (props) => {
           </Col>
         </Row>
         <br/>
+        {entries.length === 0 && timeFilter.start !== null && timeFilter.end !== null ?
+          <Row>
+            <Col className="center-align">
+              You have no data within the specified date range
+            </Col>
+          </Row>
+        :
         <Row>
           <Col lg={3}>
             <Card className="card-spacing">
@@ -380,21 +430,24 @@ const Insights = (props) => {
               <Card.Body>
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart
-                    data={data}
+                    data={graphData}
                   >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Line type="monotone" dataKey="pv" stroke="#8884d8" activeDot={{ r: 8 }} />
-                    <Line type="monotone" dataKey="uv" stroke="#82ca9d" />
+                    <Line type="monotone" dataKey="calories" stroke="#8884d8" />
+                    <Line type="monotone" dataKey="proteins" stroke="#82ca9d" />
+                    <Line type="monotone" dataKey="carbs" stroke="#F0B27A" />
+                    <Line type="monotone" dataKey="fats" stroke="#F1948A" />
                   </LineChart>
                 </ResponsiveContainer>
               </Card.Body>
             </Card>
           </Col>
         </Row>
+        }
       </div>
     );
   }
