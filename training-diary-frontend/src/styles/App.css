@@ -57,3 +57,22 @@
 .card-spacing {
   margin-bottom: 10px;
 }
+
+.indent {
+  margin-left: 8px;
+}
+
+.diet-filter-x-button {
+  padding: 5px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  margin-left: 3px;
+}
+
+.diet-custom-spacing {
+  margin-left: 5px;
+}
+
+.column-margin-spacing {
+  margin-bottom: 5px;
+}

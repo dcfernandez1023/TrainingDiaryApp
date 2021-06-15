@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-import { Row, Col, Button, Form, ListGroup, Card, Table } from 'react-bootstrap';
+import { Row, Col, Button, InputGroup, Form, ListGroup, Card, Table, Badge, DropdownButton, Dropdown } from 'react-bootstrap';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, PieChart, Pie, Legend, Cell, Tooltip, ResponsiveContainer } from "recharts";
 
 import '../../styles/insights.css';
@@ -13,6 +13,13 @@ import '../../styles/insights.css';
     * exerciseLookup - to get exercises from entries in O(1)
 */
 const Insights = (props) => {
+  const [entries, setEntries] = useState([]);
+  const [timeFilter, setTimeFilter] = useState({});
+
+  useEffect(() => {
+    setEntries(props.entries);
+  }, [props.entries])
+
   const COLORS = [
     "ForestGreen",
     "BlueViolet",
@@ -20,6 +27,12 @@ const Insights = (props) => {
     "Crimson",
     "DarkSalmon",
     "DarkSeaGreen"
+  ];
+
+  const TIME_FILTERS = [
+    "Last 7 Days",
+    "Last Month",
+    "Custom"
   ];
 
   const data = [
@@ -67,8 +80,31 @@ const Insights = (props) => {
     },
   ];
 
+  const onChangeDateRange = (filter) => {
+    if(timeFilter.name === filter) {
+      setTimeFilter({});
+      return;
+    }
+    var startDate = new Date();
+    var endDate = new Date();
+    if(filter === "Last 7 Days") {
+      startDate.setDate(startDate.getDate() - 7);
+    }
+    else if(filter === "Last Month") {
+      const month = startDate.getMonth();
+      endDate.setMonth(month - 1);
+      while(endDate.getMonth() === month) {
+        endDate.setDate(endDate.getDate() - 1);
+      }
+    }
+    else if(filter === "Custom") {
+
+    }
+    setTimeFilter({start: startDate, end: endDate, name: filter});
+  }
+
   const calculateMostLoggedExercises = () => {
-    if(props.entries === undefined || props.entries === null) {
+    if(entries === undefined || entries === null) {
       //TODO: handle this more elegantly
       alert("Could not calculate most logged exercises.");
       return [];
@@ -76,8 +112,8 @@ const Insights = (props) => {
     var mostLogged = [];
     var frequencyCount = {};
     // count number of times each exercise has been logged
-    for(var i = 0; i < props.entries.length; i++) {
-      var entry = props.entries[i];
+    for(var i = 0; i < entries.length; i++) {
+      var entry = entries[i];
       if(frequencyCount[entry.exercise_id] === undefined) {
         frequencyCount[entry.exercise_id] = 1;
       }
@@ -98,15 +134,15 @@ const Insights = (props) => {
   }
 
   const calculateExerciseCategoryBreakdown = () => {
-    if(props.entries === undefined || props.entries === null) {
+    if(entries === undefined || entries === null) {
       //TODO: handle this more elegantly
       alert("Could not calculate most logged exercises.");
       return [];
     }
     var breakdown = [];
     var breakdownCount = {};
-    for(var i = 0; i < props.entries.length; i++) {
-      var entry = props.entries[i];
+    for(var i = 0; i < entries.length; i++) {
+      var entry = entries[i];
       if(breakdownCount[props.exerciseLookup[entry.exercise_id].category] === undefined) {
         breakdownCount[props.exerciseLookup[entry.exercise_id].category] = 1;
       }
@@ -122,28 +158,28 @@ const Insights = (props) => {
   }
 
   const calculateDietAverages = () => {
-    if(props.entries === undefined || props.entries === null) {
+    if(entries === undefined || entries === null) {
       //TODO: handle this more elegantly
       alert("Could not calculate most logged exercises.");
       return {};
     }
     var averages = {calories: 0, proteins: 0, carbs: 0, fats: 0};
-    for(var i = 0; i < props.entries.length; i++) {
-      var entry = props.entries[i];
+    for(var i = 0; i < entries.length; i++) {
+      var entry = entries[i];
       averages.calories += entry.calories;
       averages.proteins += entry.protein;
       averages.carbs += entry.carbs;
       averages.fats += entry.fat;
     }
-    averages.calories = Math.round(averages.calories / props.entries.length);
-    averages.proteins = Math.round(averages.proteins / props.entries.length);
-    averages.carbs = Math.round(averages.carbs / props.entries.length);
-    averages.fats = Math.round(averages.fats / props.entries.length);
+    averages.calories = Math.round(averages.calories / entries.length);
+    averages.proteins = Math.round(averages.proteins / entries.length);
+    averages.carbs = Math.round(averages.carbs / entries.length);
+    averages.fats = Math.round(averages.fats / entries.length);
     return averages;
   }
 
   const calculateMinAndMaxDiet = () => {
-    if(props.entries === undefined || props.entries === null) {
+    if(entries === undefined || entries === null) {
       //TODO: handle this more elegantly
       alert("Could not calculate most logged exercises.");
       return {};
@@ -155,8 +191,8 @@ const Insights = (props) => {
       carbs: Number.MAX_SAFE_INTEGER,
       fats: Number.MAX_SAFE_INTEGER
     };
-    for(var i = 0; i < props.entries.length; i++) {
-      var entry = props.entries[i];
+    for(var i = 0; i < entries.length; i++) {
+      var entry = entries[i];
       // calories
       if(entry.calories > maxes.calories) {
         maxes.calories = entry.calories;
@@ -189,10 +225,10 @@ const Insights = (props) => {
     return {mins: mins, maxes: maxes};
   }
 
-  if(props.entries === undefined) {
+  if(entries === undefined) {
     return <div></div>;
   }
-  if(props.entries.length === 0) {
+  if(entries.length === 0) {
     return (
       <div className="center-align"> You have no data to be analyzed </div>
     );
@@ -266,45 +302,81 @@ const Insights = (props) => {
     var minsAndMaxes = calculateMinAndMaxDiet();
     var mins = minsAndMaxes.mins;
     var maxes = minsAndMaxes.maxes;
-    console.log(minsAndMaxes);
+    const dataPoints = [
+      {value: "calories", display: "Calories"},
+      {value: "proteins", display: "Protein"},
+      {value: "carbs", display: "Carbs"},
+      {value: "fats", display: "Fat"}
+    ];
     return (
       <div>
         <Row>
-          <Col>
-            Select
+          <Col md={7} className="column-margin-spacing">
+            {Object.keys(timeFilter).length === 0 ?
+              <div> Showing data from: <Badge pills variant="dark"> All Time </Badge> </div>
+              :
+              <div>
+                {timeFilter.name === "Custom" ?
+                  <InputGroup size="sm">
+                      <span> Showing data from: </span>
+                      <InputGroup.Prepend className="diet-custom-spacing">
+                        <InputGroup.Text> Start </InputGroup.Text>
+                      </InputGroup.Prepend>
+                      <Form.Control
+                        as="input"
+                        type="date"
+                      />
+                      <span className="diet-custom-spacing"> To </span>
+                      <InputGroup.Prepend className="diet-custom-spacing">
+                        <InputGroup.Text> End </InputGroup.Text>
+                      </InputGroup.Prepend>
+                      <Form.Control
+                        as="input"
+                        type="date"
+                      />
+                  </InputGroup>
+                :
+                  <div> Showing data from: <Badge pills variant="dark"> {timeFilter.name} </Badge> </div>
+                }
+              </div>
+            }
+          </Col>
+          <Col className="right-align column-margin-spacing" md={5}>
+            <DropdownButton title="Date Range" variant="info">
+              {TIME_FILTERS.map((filter) => {
+                return (
+                  <Dropdown.Item onClick={() => {onChangeDateRange(filter)}} active={filter === timeFilter.name}> {filter} </Dropdown.Item>
+                );
+              })}
+            </DropdownButton>
           </Col>
         </Row>
         <br/>
         <Row>
-          <Col lg={4}>
+          <Col lg={3}>
             <Card className="card-spacing">
               <Card.Header>
-                Avg. Calories and Macronutrients
+                Summary
               </Card.Header>
               <Card.Body>
                 <ListGroup variant="flush">
-                  <ListGroup.Item> <strong>Calories:</strong> {averages.calories} </ListGroup.Item>
-                  <ListGroup.Item> <strong>Proteins:</strong> {averages.proteins}g </ListGroup.Item>
-                  <ListGroup.Item> <strong>Carbs:</strong> {averages.carbs}g </ListGroup.Item>
-                  <ListGroup.Item> <strong>Fats:</strong> {averages.fats}g </ListGroup.Item>
-                </ListGroup>
-              </Card.Body>
-            </Card>
-            <Card className="card-spacing">
-              <Card.Header> Min/Max Calories and Macronutrients </Card.Header>
-              <Card.Body>
-                <ListGroup variant="flush">
-                  <ListGroup.Item> <strong>Calories:</strong> {maxes.calories} (max) | {mins.calories} (min) {averages.calories} </ListGroup.Item>
-                  <ListGroup.Item> <strong>Proteins:</strong> {averages.proteins}g </ListGroup.Item>
-                  <ListGroup.Item> <strong>Carbs:</strong> {averages.carbs}g </ListGroup.Item>
-                  <ListGroup.Item> <strong>Fats:</strong> {averages.fats}g </ListGroup.Item>
+                  {dataPoints.map((point) => {
+                    return (
+                      <ListGroup.Item>
+                        <div> <strong> {point.display} </strong> </div>
+                        <div className="indent"> Average: {averages[point.value]} </div>
+                        <div className="indent"> Min: {mins[point.value]} </div>
+                        <div className="indent"> Max: {maxes[point.value]} </div>
+                      </ListGroup.Item>
+                    );
+                  })}
                 </ListGroup>
               </Card.Body>
             </Card>
           </Col>
-          <Col lg={8}>
+          <Col lg={9}>
             <Card className="card-equal-height">
-              <Card.Header> Calorie and Macronutrient Graph </Card.Header>
+              <Card.Header> Graph </Card.Header>
               <Card.Body>
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart
