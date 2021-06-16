@@ -17,6 +17,7 @@ const Diet = (props) => {
   const [fatalMsg, setFatalMsg] = useState("");
   const [entries, setEntries] = useState();
   const [addShow, setAddShow] = useState(false);
+  const [editShow, setEditShow] = useState(false);
   const [deleteShow, setDeleteShow] = useState(false);
   const [modalHeader, setModalHeader] = useState("");
   const [modalDiet, setModalDiet] = useState();
@@ -85,6 +86,36 @@ const Diet = (props) => {
     CONTROLLER.createDiet(token, user_id, diet, callback, callbackOnError);
   }
 
+  const editDiet = (diet, modalCallback) => {
+    var token = LOCAL_STORAGE.getStorageItem("TRAINING_DIARY_API_TOKEN");
+    var user_id = LOCAL_STORAGE.getStorageItem("TRAINING_DIARY_USER");
+    if(token === null || token === undefined || user_id === null || user_id === undefined) {
+      //TODO: if token cannot be pulled from localstorage, log the user out
+      alert("Could not get token");
+      return;
+    }
+    const callback = (res) => {
+      if(res.status == 200) {
+        var copy = entries.slice();
+        for(var i = 0; i < copy.length; i++) {
+          if(copy[i].diet_id === res.data.data.diet_id) {
+            console.log(res.data.data);
+            copy[i] = res.data.data;
+            break;
+          }
+        }
+        setEntries(copy);
+        modalCallback();
+      }
+    };
+    const callbackOnError = (error) => {
+      modalCallback();
+      setIsFatal(true);
+      setFatalMsg(error.response.data.message);
+    };
+    CONTROLLER.editDiet(token, user_id, diet, callback, callbackOnError);
+  }
+
   const deleteDiet = (diet, modalCallback) => {
     var token = LOCAL_STORAGE.getStorageItem("TRAINING_DIARY_API_TOKEN");
     var user_id = LOCAL_STORAGE.getStorageItem("TRAINING_DIARY_USER");
@@ -125,9 +156,17 @@ const Diet = (props) => {
   const onCloseModal = () => {
     setAddShow(false);
     setDeleteShow(false);
+    setEditShow(false);
     setModalDiet();
     setModalHeader("");
     setModalType("");
+  }
+
+  const openEditModal = (diet) => {
+    setEditShow(true);
+    setModalDiet(diet);
+    setModalHeader("Edit Diet");
+    setModalType("edit");
   }
 
   const openDeleteModal = (type, diet) => {
@@ -202,11 +241,11 @@ const Diet = (props) => {
   return (
     <Container>
       <DietModal
-        show={addShow ? addShow : deleteShow ? deleteShow : false}
+        show={addShow ? addShow : editShow ? editShow :deleteShow ? deleteShow : false}
         header={modalHeader}
         diet={modalDiet}
         type={modalType}
-        onSubmitModal={addShow ? createDiet : deleteShow ? deleteDiet : undefined}
+        onSubmitModal={addShow ? createDiet : editShow ? editDiet : deleteShow ? deleteDiet : undefined}
         onClose={onCloseModal}
       />
       <Row>
@@ -230,6 +269,7 @@ const Diet = (props) => {
               sortRecent={sortEntriesDescending}
               sortOldest={sortEntriesAscending}
               onClickDelete={openDeleteModal}
+              onClickEdit={openEditModal}
             />
           }
         </Tab>

@@ -8,6 +8,7 @@ import { Row, Col, Button, Form, InputGroup, Table, Spinner } from 'react-bootst
     * columns - array of strings
     * rows - array of array of strings
     * onClickDelete
+    * onClickEdit
     * sortRecent
     * sortOldest
 */
@@ -156,6 +157,7 @@ const EntryLogs = (props) => {
               <tr>
                 <td>
                   <Button variant="outline-dark" size="sm" onClick={() => {props.onClickDelete("delete", row.entry)}}> 🗑️ </Button>
+                  <Button variant="outline-dark" size="sm" onClick={() => {props.onClickEdit(row.entry)}}> ✏️ </Button>
                 </td>
                 {row.data.map((data) => {
                   if(data.key === "timestamp") {
@@ -176,6 +178,7 @@ const EntryLogs = (props) => {
               <tr>
                 <td>
                   <Button variant="outline-dark" size="sm" onClick={() => {props.onClickDelete("delete", row.entry)}}> 🗑️ </Button>
+                  <Button variant="outline-dark" size="sm" onClick={() => {props.onClickEdit(row.entry)}}> ✏️ </Button>
                 </td>
                 {row.data.map((data) => {
                   if(data.key === "timestamp") {

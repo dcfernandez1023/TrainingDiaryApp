@@ -477,6 +477,7 @@ const Exercise = (props) => {
               columns={TABLE_COLUMNS}
               rows={getEntryTableData()}
               onClickDelete={openEntryModal}
+              onClickEdit={() => {return;}}
               sortRecent={sortEntriesDescending}
               sortOldest={sortEntriesAscending}
             />

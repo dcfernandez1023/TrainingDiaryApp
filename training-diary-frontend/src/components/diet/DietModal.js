@@ -57,11 +57,14 @@ const DietModal = (props) => {
     if(dateStr.trim().length === 0) {
       return;
     }
-    var dateObj = new Date(dateStr);
-    copy.timestamp = dateObj.getTime();
-    copy.day = dateObj.getDate() + 1;
-    copy.month = dateObj.getMonth() + 1;
-    copy.year = dateObj.getFullYear();
+    if(type === "add") {
+      var dateObj = new Date(dateStr);
+      copy.timestamp = dateObj.getTime();
+      copy.day = dateObj.getDate() + 1;
+      copy.month = dateObj.getMonth() + 1;
+      copy.year = dateObj.getFullYear();
+    }
+    console.log(copy);
     for(var i = 0; i < MODEL.metaData.length; i++) {
       var field = MODEL.metaData[i];
       if(copy[field.value].toString().trim().length == 0 && field.required && type !== "delete") {
@@ -93,7 +96,7 @@ const DietModal = (props) => {
                 type="date"
                 defaultValue={diet === undefined || diet.timestamp === 0 ? "" : UTIL.formatDate(diet.timestamp)}
                 required
-                disabled={type === "delete"}
+                disabled={type === "delete" || type === "edit"}
               />
             </Col>
             <Col xs={2}></Col>
