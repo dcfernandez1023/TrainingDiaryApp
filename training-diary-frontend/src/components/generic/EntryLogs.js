@@ -157,7 +157,7 @@ const EntryLogs = (props) => {
               <tr>
                 <td>
                   <Button variant="outline-dark" size="sm" onClick={() => {props.onClickDelete("delete", row.entry)}}> 🗑️ </Button>
-                  <Button variant="outline-dark" size="sm" onClick={() => {props.onClickEdit(row.entry)}}> ✏️ </Button>
+                  <Button variant="outline-dark" size="sm" onClick={() => {props.onClickEdit("edit", row.entry)}}> ✏️ </Button>
                 </td>
                 {row.data.map((data) => {
                   if(data.key === "timestamp") {
@@ -178,7 +178,7 @@ const EntryLogs = (props) => {
               <tr>
                 <td>
                   <Button variant="outline-dark" size="sm" onClick={() => {props.onClickDelete("delete", row.entry)}}> 🗑️ </Button>
-                  <Button variant="outline-dark" size="sm" onClick={() => {props.onClickEdit(row.entry)}}> ✏️ </Button>
+                  <Button variant="outline-dark" size="sm" onClick={() => {props.onClickEdit("edit", row.entry)}}> ✏️ </Button>
                 </td>
                 {row.data.map((data) => {
                   if(data.key === "timestamp") {

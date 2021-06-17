@@ -4,6 +4,7 @@ import { Container, Row, Col, Button, Spinner, Form, Modal, ListGroup } from 're
 
 const MODEL = require('../../models/exerciseEntry.js');
 const LOCAL_STORAGE = require('../../util/localStorageHelper.js');
+const UTIL = require('../../util/util.js');
 
 
 /*
@@ -38,8 +39,8 @@ const EntryModal = (props) => {
     setType(props.type);
     setExercise(props.exercise);
     setEntry(props.entry);
-    if(props.entryDate !== undefined && props.entryDate instanceof Date) {
-      setEntryDate(props.entryDate);
+    if(props.entry !== undefined) {
+      setEntryDate(UTIL.formatDate(new Date(props.entry.timestamp)));
     }
   }, [props.show, props.exercises, props.entryDate]);
 
@@ -51,6 +52,7 @@ const EntryModal = (props) => {
     setCurrScreen("date");
     setExercisesSelected({});
     setSubmitDisabled(false);
+    setValidated(false);
   }
 
   const onSelectExercise = (exercise_id) => {
@@ -64,10 +66,28 @@ const EntryModal = (props) => {
     setExercisesSelected(copy);
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = (e) => {
     setShowSpinner(true);
     if(type === "delete") {
       props.onSubmitModal(props.entry.exercise_entry_id, closeModal);
+    }
+    else if(type === "edit") {
+      e.preventDefault();
+      setValidated(true);
+      if(entryDate.trim().length === 0) {
+        setShowSpinner(false);
+        return;
+      }
+      var user_id = LOCAL_STORAGE.getStorageItem("TRAINING_DIARY_USER");
+      var date = new Date(entryDate);
+      console.log(entry);
+      var copy = Object.assign({}, entry);
+      copy.timestamp = date.getTime();
+      copy.day = date.getDate();
+      copy.month = date.getMonth();
+      copy.year = date.getFullYear();
+      copy.notes = note;
+      props.onSubmitModal(copy, closeModal);
     }
     else {
       var entries = [];
@@ -88,7 +108,72 @@ const EntryModal = (props) => {
     }
   }
 
-  if(type === "delete") {
+  if(type === "edit") {
+    return (
+      <Modal show={show} onHide={closeModal} backdrop="static">
+        <Modal.Header closeButton>
+          <Modal.Title> {props.header} </Modal.Title>
+        </Modal.Header>
+        <Form onSubmit={handleSubmit} noValidate validated={validated}>
+          <Modal.Body>
+            <Row>
+              <Col></Col>
+              <Col xs={8}>
+                <Form.Label> Date Performed </Form.Label>
+                <Form.Control
+                  id="log-date-edit"
+                  as="input"
+                  type="date"
+                  defaultValue={entry === undefined ? "" : UTIL.formatDate(new Date(entry.timestamp).toLocaleDateString())}
+                  onChange={(event) => {
+                    setValidated(false);
+                    setEntryDate(event.target.value);
+                  }}
+                  required
+                />
+              </Col>
+              <Col></Col>
+            </Row>
+            <br/>
+            <Row>
+              <Col>
+                <Form.Label> Exercise </Form.Label>
+                <ListGroup.Item>
+                  {exercise === undefined ? "" : exercise.name + " | " + exercise.category + " | " + exercise.sets + " x " + exercise.reps + " @ " + exercise.amount + " " + exercise.units}
+                </ListGroup.Item>
+              </Col>
+            </Row>
+            <br/>
+            <Row>
+              <Col>
+                <Form.Label> Notes </Form.Label>
+                <Form.Control
+                  as="textarea"
+                  rows={4}
+                  value={entry.notes}
+                  onChange={(e) => {
+                    setValidated(false);
+                    var copy = Object.assign({}, entry);
+                    copy.notes = e.target.value;
+                    setEntry(copy);
+                  }}
+                />
+              </Col>
+            </Row>
+          </Modal.Body>
+          <Modal.Footer>
+          {showSpinner ?
+            <Spinner animation="border" variant="primary" />
+          :
+            <div></div>
+          }
+            <Button type="submit" variant="info"> Done </Button>
+          </Modal.Footer>
+        </Form>
+      </Modal>
+    );
+  }
+  else if(type === "delete") {
     return (
       <Modal show={show} onHide={closeModal} backdrop="static">
         <Modal.Header closeButton>

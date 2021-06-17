@@ -162,11 +162,11 @@ const Diet = (props) => {
     setModalType("");
   }
 
-  const openEditModal = (diet) => {
+  const openEditModal = (type, diet) => {
     setEditShow(true);
     setModalDiet(diet);
     setModalHeader("Edit Diet");
-    setModalType("edit");
+    setModalType(type);
   }
 
   const openDeleteModal = (type, diet) => {
@@ -241,7 +241,7 @@ const Diet = (props) => {
   return (
     <Container>
       <DietModal
-        show={addShow ? addShow : editShow ? editShow :deleteShow ? deleteShow : false}
+        show={addShow ? addShow : editShow ? editShow : deleteShow ? deleteShow : false}
         header={modalHeader}
         diet={modalDiet}
         type={modalType}

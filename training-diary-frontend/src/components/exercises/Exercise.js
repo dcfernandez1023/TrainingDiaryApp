@@ -216,6 +216,35 @@ const Exercise = (props) => {
     CONTROLLER.createEntries(token, user_id, newEntries, callback, callbackOnError);
   }
 
+  const editEntry = (entry, modalCallback) => {
+    var token = LOCAL_STORAGE.getStorageItem("TRAINING_DIARY_API_TOKEN");
+    var user_id = LOCAL_STORAGE.getStorageItem("TRAINING_DIARY_USER");
+    if(token === null || token === undefined || user_id === null || user_id === undefined) {
+      //TODO: if token cannot be pulled from localstorage, log the user out
+      alert("Could not get token");
+      return;
+    }
+    const callback = (res) => {
+      if(res.status == 200) {
+        var copy = entries.slice();
+        for(var i = 0; i < copy.length; i++) {
+          if(copy[i].exercise_entry_id === res.data.data.exercise_entry_id) {
+            copy[i] = res.data.data;
+            break;
+          }
+        }
+        setEntries(copy);
+        modalCallback();
+      }
+    };
+    const callbackOnError = (error) => {
+      modalCallback();
+      setIsFatal(true);
+      setFatalMsg(error.response.data.message);
+    };
+    CONTROLLER.editEntry(token, user_id, entry, callback, callbackOnError);
+  }
+
   const deleteEntry = (exercise_entry_id, modalCallback) => {
     var token = LOCAL_STORAGE.getStorageItem("TRAINING_DIARY_API_TOKEN");
     var user_id = LOCAL_STORAGE.getStorageItem("TRAINING_DIARY_USER");
@@ -346,8 +375,15 @@ const Exercise = (props) => {
 
   const openEntryModal = (type, entry) => {
     setEntryShow(true);
+    console.log(entry);
     if(type === "delete") {
       setModalHeader("Delete Log");
+      setModalType(type);
+      setModalEntry(entry);
+      setModalExercise(exerciseLookup[entry.exercise_id]);
+    }
+    else if(type === "edit") {
+      setModalHeader("Edit Log");
       setModalType(type);
       setModalEntry(entry);
       setModalExercise(exerciseLookup[entry.exercise_id]);
@@ -399,7 +435,7 @@ const Exercise = (props) => {
         entry={modalEntry}
         exercise={modalExercise}
         onClose={closeEntryModal}
-        onSubmitModal={modalType === "delete" ? deleteEntry : createEntries}
+        onSubmitModal={modalType === "delete" ? deleteEntry : modalType === "edit" ? editEntry : createEntries}
         createNew={openAddModal}
       />
       <Row>
@@ -477,7 +513,7 @@ const Exercise = (props) => {
               columns={TABLE_COLUMNS}
               rows={getEntryTableData()}
               onClickDelete={openEntryModal}
-              onClickEdit={() => {return;}}
+              onClickEdit={openEntryModal}
               sortRecent={sortEntriesDescending}
               sortOldest={sortEntriesAscending}
             />
