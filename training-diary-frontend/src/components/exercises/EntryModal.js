@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import { Container, Row, Col, Button, Spinner, Form, Modal, ListGroup } from 'react-bootstrap';
+import DatePicker from "react-datepicker";
 
 const MODEL = require('../../models/exerciseEntry.js');
 const LOCAL_STORAGE = require('../../util/localStorageHelper.js');
@@ -23,9 +24,9 @@ const EntryModal = (props) => {
   const [show, setShow] = useState(false);
   const [exercises, setExercises] = useState();
   const [type, setType] = useState("");
-  const [entry, setEntry] = useState();
+  const [entry, setEntry] = useState({});
   const [exercise, setExercise] = useState();
-  const [entryDate, setEntryDate] = useState("");
+  const [entryDate, setEntryDate] = useState(null);
   const [validated, setValidated] = useState(false);
   const [showSpinner, setShowSpinner] = useState(false);
   const [submitDisabled, setSubmitDisabled] = useState(false);
@@ -38,11 +39,11 @@ const EntryModal = (props) => {
     setExercises(props.exercises);
     setType(props.type);
     setExercise(props.exercise);
-    setEntry(props.entry);
     if(props.entry !== undefined) {
-      setEntryDate(UTIL.formatDate(new Date(props.entry.timestamp)));
+      setEntry(props.entry);
+      setEntryDate(new Date(props.entry.timestamp));
     }
-  }, [props.show, props.exercises, props.entryDate]);
+  }, [props.show, props.exercises, props.entryDate, props.entry]);
 
   const closeModal = () => {
     props.onClose();
@@ -66,30 +67,30 @@ const EntryModal = (props) => {
     setExercisesSelected(copy);
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e, entryEdit) => {
     setShowSpinner(true);
     if(type === "delete") {
+      setSubmitDisabled(true);
       props.onSubmitModal(props.entry.exercise_entry_id, closeModal);
     }
     else if(type === "edit") {
       e.preventDefault();
       setValidated(true);
-      if(entryDate.trim().length === 0) {
+      if(entryDate === null) {
         setShowSpinner(false);
         return;
       }
+      setSubmitDisabled(true);
       var user_id = LOCAL_STORAGE.getStorageItem("TRAINING_DIARY_USER");
-      var date = new Date(entryDate);
-      console.log(entry);
-      var copy = Object.assign({}, entry);
-      copy.timestamp = date.getTime();
-      copy.day = date.getDate();
-      copy.month = date.getMonth();
-      copy.year = date.getFullYear();
-      copy.notes = note;
-      props.onSubmitModal(copy, closeModal);
+      entryEdit.timestamp = entryDate.getTime();
+      entryEdit.day = entryDate.getDate() + 2;
+      entryEdit.month = entryDate.getMonth() + 2;
+      entryEdit.year = entryDate.getFullYear();
+      entryEdit.notes = entryEdit.notes;
+      props.onSubmitModal(entryEdit, closeModal);
     }
     else {
+      setSubmitDisabled(true);
       var entries = [];
       var user_id = LOCAL_STORAGE.getStorageItem("TRAINING_DIARY_USER");
       var date = new Date(entryDate);
@@ -114,12 +115,29 @@ const EntryModal = (props) => {
         <Modal.Header closeButton>
           <Modal.Title> {props.header} </Modal.Title>
         </Modal.Header>
-        <Form onSubmit={handleSubmit} noValidate validated={validated}>
+        <Form onSubmit={(e) => {
+            handleSubmit(e, entry);
+          }}
+          noValidate validated={validated}>
           <Modal.Body>
             <Row>
               <Col></Col>
               <Col xs={8}>
                 <Form.Label> Date Performed </Form.Label>
+                <DatePicker
+                  className="customDatePickerWidth"
+                  placeholderText="Click to select a date"
+                  selected={entryDate}
+                  customInput={
+                    <Form.Control
+                      as="input"
+                      required
+                    />
+                  }
+                  required
+                  onChange={(date) => {setEntryDate(date)}}
+                />
+                {/*
                 <Form.Control
                   id="log-date-edit"
                   as="input"
@@ -131,6 +149,8 @@ const EntryModal = (props) => {
                   }}
                   required
                 />
+                */
+              }
               </Col>
               <Col></Col>
             </Row>
@@ -167,7 +187,7 @@ const EntryModal = (props) => {
           :
             <div></div>
           }
-            <Button type="submit" variant="info"> Done </Button>
+            <Button type="submit" variant="info" disabled={submitDisabled}> Done </Button>
           </Modal.Footer>
         </Form>
       </Modal>
@@ -202,7 +222,7 @@ const EntryModal = (props) => {
         :
           <div></div>
         }
-          <Button variant="danger" onClick={handleSubmit}> Delete </Button>
+          <Button variant="danger" onClick={handleSubmit} disabled={submitDisabled}> Delete </Button>
         </Modal.Footer>
       </Modal>
     );
@@ -219,6 +239,20 @@ const EntryModal = (props) => {
             <Col></Col>
             <Col xs={8}>
               <Form.Label> Date Performed </Form.Label>
+              <DatePicker
+                className="customDatePickerWidth"
+                placeholderText="Click to select a date"
+                selected={entryDate}
+                customInput={
+                  <Form.Control
+                    as="input"
+                    required
+                  />
+                }
+                required
+                onChange={(date) => {setEntryDate(date)}}
+              />
+              {/*
               <Form.Control
                 id="log-date"
                 as="input"
@@ -228,13 +262,14 @@ const EntryModal = (props) => {
                 }}
                 value={entryDate}
               />
+              */}
             </Col>
             <Col></Col>
           </Row>
           <br/>
           <Row>
             <Col className="entry-modal-next-align">
-              <Button variant="info" onClick={() => {setCurrScreen("exercises")}} disabled={entryDate.length == 0}> Next </Button>
+              <Button variant="info" onClick={() => {setCurrScreen("exercises")}} disabled={entryDate === null}> Next </Button>
             </Col>
           </Row>
         </div>
@@ -302,7 +337,7 @@ const EntryModal = (props) => {
               <div></div>
             }
             <Col className="entry-modal-next-align">
-              <Button variant="info" onClick={handleSubmit}> Done </Button>
+              <Button variant="info" onClick={handleSubmit} disabled={submitDisabled}> Done </Button>
             </Col>
           </Row>
         </div>

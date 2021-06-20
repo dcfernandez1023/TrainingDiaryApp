@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import { Jumbotron, Container, Alert, Row, Col, Button, Card, Tabs, Tab, Form } from 'react-bootstrap';
+import DatePicker from "react-datepicker";
 
 import '../../styles/login.css';
 
@@ -15,6 +16,7 @@ const Login = (props) => {
   const [newUser, setNewUser] = useState({});
   const [registerPassword, setRegisterPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [birthday, setBirthday] = useState(null);
   const [loginValidated, setLoginValidated] = useState(false);
   const [registerValidated, setRegisterValidated] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -49,7 +51,7 @@ const Login = (props) => {
     setRegisterValidated(true);
     for(var i = 0; i < USER.displayFields.length; i++) {
       var key = USER.displayFields[i].value;
-      if(key === "birthday" && document.getElementById("register-birthday").value.trim().length === 0) {
+      if(key === "birthday" && birthday === null) {
         return;
       }
       if(newUser[key].trim().length === 0 && key !== "birthday") {
@@ -66,7 +68,7 @@ const Login = (props) => {
     }
     // prepare data to send to register api
     var data = Object.assign({}, newUser);
-    data.birthday = new Date(document.getElementById("register-birthday").value).getTime();
+    data.birthday = birthday.getTime();
     const callback = (res) => {
       if(res.status == 200) {
         props.setIsLoggedIn(true);
@@ -110,7 +112,7 @@ const Login = (props) => {
                     setErrorMsg("");
                     setRegisterValidated(false);
                     setLoginValidated(false);
-                    document.getElementById("register-birthday").value = "";
+                    setBirthday(null);
                   }
                   else if(key === "register") {
                     setNewUser(Object.assign({}, USER.user));
@@ -199,12 +201,18 @@ const Login = (props) => {
                         </Col>
                         <Col md={6}>
                           <Form.Label> Birthday </Form.Label>
-                          <Form.Control
-                            id="register-birthday"
-                            as="input"
-                            type="date"
-                            name="birthday"
+                          <DatePicker
+                            className="customDatePickerWidth"
+                            placeholderText="Click to select a date"
+                            selected={birthday}
+                            customInput={
+                              <Form.Control
+                                as="input"
+                                required
+                              />
+                            }
                             required
+                            onChange={(date) => {setBirthday(date)}}
                           />
                         </Col>
                       </Row>

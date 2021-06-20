@@ -185,6 +185,9 @@ const Insights = (props) => {
     var breakdownCount = {};
     for(var i = 0; i < entries.length; i++) {
       var entry = entries[i];
+      if(props.exerciseLookup[entry.exercise_id] === undefined) {
+        return [];
+      }
       if(breakdownCount[props.exerciseLookup[entry.exercise_id].category] === undefined) {
         breakdownCount[props.exerciseLookup[entry.exercise_id].category] = 1;
       }

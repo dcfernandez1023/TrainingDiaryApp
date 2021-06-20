@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import { Container, Row, Col, Button, Spinner, Form, Modal } from 'react-bootstrap';
+import DatePicker from "react-datepicker";
 
 const MODEL = require('../../models/diet.js');
 const UTIL = require('../../util/util.js');
@@ -50,15 +51,14 @@ const DietModal = (props) => {
   const handleSubmit = (event) => {
     event.preventDefault();
     setValidated(true);
+    if(diet.timestamp === 0 || diet.timestamp === null) {
+      return;
+    }
     // ensure data types
     var copy = Object.assign({}, diet);
     // get date
-    var dateStr = document.getElementById("diet-date").value;
-    if(dateStr.trim().length === 0) {
-      return;
-    }
     if(type === "add") {
-      var dateObj = new Date(dateStr);
+      var dateObj = new Date(diet.timestamp);
       copy.timestamp = dateObj.getTime();
       copy.day = dateObj.getDate() + 1;
       copy.month = dateObj.getMonth() + 1;
@@ -90,6 +90,24 @@ const DietModal = (props) => {
             <Col xs={2}></Col>
             <Col className="exercise-modal-input-spacing">
               <Form.Label> Date </Form.Label>
+              <DatePicker
+                className="customDatePickerWidth"
+                placeholderText="Click to select a date"
+                selected={diet === undefined || diet.timestamp == 0 ? null : new Date(diet.timestamp)}
+                customInput={
+                  <Form.Control
+                    as="input"
+                    required
+                  />
+                }
+                required
+                onChange={(date) => {
+                  var copy = Object.assign({}, diet);
+                  copy.timestamp = date.getTime();
+                  setDiet(copy);
+                }}
+              />
+              {/*
               <Form.Control
                 id="diet-date"
                 as="input"
@@ -98,6 +116,7 @@ const DietModal = (props) => {
                 required
                 disabled={type === "delete" || type === "edit"}
               />
+              */}
             </Col>
             <Col xs={2}></Col>
           </Row>

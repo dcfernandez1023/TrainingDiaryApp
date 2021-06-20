@@ -375,7 +375,6 @@ const Exercise = (props) => {
 
   const openEntryModal = (type, entry) => {
     setEntryShow(true);
-    console.log(entry);
     if(type === "delete") {
       setModalHeader("Delete Log");
       setModalType(type);
