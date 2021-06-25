@@ -35,6 +35,8 @@ const Diet = (props) => {
       alert("Could not get token");
       return;
     }
+    console.log(token);
+    console.log(user_id);
     const callback = (res) => {
       if(res.status == 200) {
         var temp = res.data.data;
@@ -74,6 +76,10 @@ const Diet = (props) => {
         if(!isUpdate) {
           copy.push(res.data.data);
         }
+        // sort descending by timestamp
+        copy.sort((ele1, ele2) => {
+          return ele2.timestamp - ele1.timestamp;
+        });
         setEntries(copy);
       }
       modalCallback();
@@ -104,6 +110,10 @@ const Diet = (props) => {
             break;
           }
         }
+        // sort descending by timestamp
+        copy.sort((ele1, ele2) => {
+          return ele2.timestamp - ele1.timestamp;
+        });
         setEntries(copy);
         modalCallback();
       }
@@ -181,11 +191,11 @@ const Diet = (props) => {
       return [];
     }
     var rows = [];
+    const macros = ["protein", "carbs", "fat"];
     for(var i = 0; i < entries.length; i++) {
       var row = {};
       var data = [];
       var entry = entries[i];
-      var macros = ["protein", "carbs", "fat"];
       for(var n = 0; n < MODEL.metaData.length; n++) {
         if(MODEL.metaData[n].required) {
           var key = MODEL.metaData[n].value;
@@ -203,6 +213,7 @@ const Diet = (props) => {
       row.data = data;
       rows.push(row);
     }
+    console.log(rows);
     return rows;
   }
 
@@ -264,7 +275,7 @@ const Diet = (props) => {
             <p className="center-align"> You have no diet data </p>
             :
             <EntryLogs
-              columns={["Date", "Calories", "Proteins", "Fats", "Carbs", "Notes"]}
+              columns={["Date", "Calories", "Proteins", "Carbs", "Fats", "Notes"]}
               rows={calculateTableData()}
               sortRecent={sortEntriesDescending}
               sortOldest={sortEntriesAscending}

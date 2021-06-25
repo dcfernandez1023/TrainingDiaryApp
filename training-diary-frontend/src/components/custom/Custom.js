@@ -6,7 +6,7 @@ import { Container, Row, Col, Button } from 'react-bootstrap';
 const Custom = (props) => {
   return (
     <Container>
-      Custom
+      This feature is currently in progress 🚧
     </Container>
   );
 }

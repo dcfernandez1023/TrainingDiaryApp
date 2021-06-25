@@ -37,6 +37,10 @@
   }
 }
 
+.dropdown-toggle::after {
+    content: none;
+}
+
 .parent-div {
   background-color: white;
   overflow-x: hidden;
@@ -71,6 +75,10 @@
 
 .diet-custom-spacing {
   margin-left: 5px;
+}
+
+.column-spacing {
+  margin-bottom: 8px;
 }
 
 .column-margin-spacing {

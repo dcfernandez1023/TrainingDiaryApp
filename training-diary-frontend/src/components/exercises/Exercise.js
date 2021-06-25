@@ -204,6 +204,10 @@ const Exercise = (props) => {
           copy.push(entry);
         }
         console.log(entries);
+        // sort descending by timestamp
+        copy.sort((ele1, ele2) => {
+          return ele2.timestamp - ele1.timestamp;
+        });
         setEntries(copy);
       }
       modalCallback();
@@ -233,6 +237,10 @@ const Exercise = (props) => {
             break;
           }
         }
+        // sort descending by timestamp
+        copy.sort((ele1, ele2) => {
+          return ele2.timestamp - ele1.timestamp;
+        });
         setEntries(copy);
         modalCallback();
       }

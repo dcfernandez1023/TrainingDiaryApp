@@ -7,6 +7,7 @@ class BodyWeight:
     SCHEMA = {
         "bw_id": str,
         "user_id": str,
+        "type": str,
         "timestamp": int,
         "day": int,
         "month": int,
