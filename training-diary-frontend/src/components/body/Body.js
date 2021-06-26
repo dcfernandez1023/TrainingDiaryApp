@@ -98,8 +98,62 @@ const Body = (props) => {
     setModalType("");
   }
 
+  const sortEntriesAscending = () => {
+    var copy = bfEntries.slice();
+    copy.sort((ele1, ele2) => {
+      return ele1.timestamp - ele2.timestamp;
+    });
+    setBfEntries(copy);
+  }
+
+  const sortEntriesDescending = () => {
+    var copy = bfEntries.slice();
+    copy.sort((ele1, ele2) => {
+      return ele2.timestamp - ele1.timestamp;
+    });
+    setBfEntries(copy);
+  }
+
   const calculateTableData = () => {
-    return [];
+    var rows = [];
+    for(var i = 0; i < bfEntries.length; i++) {
+      var entry = bfEntries[i];
+      var row = {};
+      var data = [];
+      if(entry.type === "BODY_FAT") {
+        for(var n = 0; n < MODEL.bodyFatMetaData.length; n++) {
+          if(MODEL.bodyFatMetaData[n].required) {
+            var key = MODEL.bodyFatMetaData[n].value;
+            if(key === "type") {
+              data.push({key: key, value: "Body Fat"});
+            }
+            else {
+              data.push({key: key, value: entry[key]});
+            }
+          }
+        }
+      }
+      else if(entry.type === "BODY_WEIGHT") {
+        for(var n = 0; n < MODEL.bodyFatMetaData.length; n++) {
+          if(MODEL.bodyFatMetaData[n].required) {
+            var key = MODEL.bodyFatMetaData[n].value;
+            if(key === "type") {
+              data.push({key: key, value: "Body Weight"});
+            }
+            else {
+              data.push({key: key, value: entry[key]});
+            }
+          }
+        }
+      }
+      // push notes, since it's not required but it should be shown
+      data.push({key: "notes", value: entry.notes});
+      row.entry = entry;
+      row.data = data;
+      rows.push(row);
+    }
+    console.log(rows);
+    return rows;
   }
 
   if(bfEntries === undefined) {
@@ -144,14 +198,18 @@ const Body = (props) => {
       <Tabs defaultActiveKey="logs">
         <Tab eventKey="logs" title="Logs 📝">
           <br/>
-          <EntryLogs
-            columns={["Date", "Type", "Percentage/Weight", "Notes"]}
-            rows={calculateTableData()}
-            onClickDelete={undefined}
-            onClickEdit={undefined}
-            sortRecent={undefined}
-            sortOldest={undefined}
-          />
+            {bfEntries.length === 0 ?
+              <p className="center-align"> You have no body data </p>
+              :
+              <EntryLogs
+                columns={["Date", "Type", "Percentage/Weight", "Notes"]}
+                rows={calculateTableData()}
+                onClickDelete={undefined}
+                onClickEdit={undefined}
+                sortRecent={sortEntriesDescending}
+                sortOldest={sortEntriesAscending}
+              />
+            }
         </Tab>
         <Tab eventKey="insights" title="Insights 📈">
         </Tab>
