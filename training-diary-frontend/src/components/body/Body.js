@@ -421,6 +421,17 @@ const Body = (props) => {
     return rows;
   }
 
+  const mergeEntries = () => {
+    var merged = [];
+    for(var i = 0; i < bfEntries.length; i++) {
+      merged.push(bfEntries[i]);
+    }
+    for(var i = 0; i < bwEntries.length; i++) {
+      merged.push(bwEntries[i]);
+    }
+    return merged;
+  }
+
   if(bfEntries === undefined || bwEntries === undefined) {
     return (
       <Row>
@@ -485,6 +496,11 @@ const Body = (props) => {
             }
         </Tab>
         <Tab eventKey="insights" title="Insights 📈">
+          <br/>
+          <Insights
+            entries={mergeEntries()}
+            model="body"
+          />
         </Tab>
       </Tabs>
     </Container>

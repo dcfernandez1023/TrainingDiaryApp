@@ -205,7 +205,7 @@ const Insights = (props) => {
   const calculateDietAverages = () => {
     if(entries === undefined || entries === null) {
       //TODO: handle this more elegantly
-      alert("Could not calculate most logged exercises.");
+      alert("Could not calculate diet averages.");
       return {};
     }
     var averages = {calories: 0, proteins: 0, carbs: 0, fats: 0};
@@ -226,7 +226,7 @@ const Insights = (props) => {
   const calculateMinAndMaxDiet = () => {
     if(entries === undefined || entries === null) {
       //TODO: handle this more elegantly
-      alert("Could not calculate most logged exercises.");
+      alert("Could not calculate min and max diet data.");
       return {};
     }
     var maxes = {calories: 0, proteins: 0, carbs: 0, fats: 0};
@@ -268,6 +268,75 @@ const Insights = (props) => {
       }
     }
     return {mins: mins, maxes: maxes};
+  }
+
+  const calculateMinAndMaxBody = () => {
+    if(entries === undefined || entries === null) {
+      //TODO: handle this more elegantly
+      alert("Could not calculate min and max body data.");
+      return {};
+    }
+    var minMax = {
+      minBf: Number.MAX_SAFE_INTEGER,
+      minBw: Number.MAX_SAFE_INTEGER,
+      maxBf: 0,
+      maxBw: 0,
+      avgBf: 0,
+      avgBw: 0
+    };
+    var bfTotal = 0;
+    var bwTotal = 0;
+    var bfCount = 0;
+    var bwCount = 0;
+    for(var i = 0; i < entries.length; i++) {
+      var entry = entries[i];
+      // determine mins, maxes, and avgs
+      if(entry.type === "BODY_FAT") {
+        if(entry.percentage < minMax.minBf) {
+          minMax.minBf = entry.percentage;
+        }
+        else {
+          minMax.maxBf = entry.percentage;
+        }
+        bfTotal += entry.percentage;
+        bfCount++;
+      }
+      else if(entry.type === "BODY_WEIGHT") {
+        if(entry.weight < minMax.minBw) {
+          minMax.minBw = entry.weight;
+        }
+        else {
+          minMax.maxBw = entry.weight;
+        }
+        bwTotal += entry.weight;
+        bwCount++;
+      }
+    }
+    minMax.avgBf = Math.round(bfTotal / bfCount);
+    minMax.avgBw = Math.round(bwTotal / bwCount);
+    console.log(minMax);
+    return minMax;
+  }
+
+  const calculateBodyGraphData = () => {
+    if(entries === null || entries === undefined) {
+      return [];
+    }
+    var copy = entries.slice();
+    copy.sort((ele1, ele2) => {
+      return ele1.timestamp - ele2.timestamp;
+    });
+    var data = [];
+    for(var i = 0; i < copy.length; i++) {
+      var entry = copy[i];
+      var dataPoint = {
+        name: new Date(entry.timestamp).toLocaleDateString(),
+        "body fat %": entry.percentage,
+        "body weight": entry.weight
+      }
+      data.push(dataPoint);
+    }
+    return data;
   }
 
   if(entries === undefined) {
@@ -406,7 +475,7 @@ const Insights = (props) => {
           </Row>
         :
         <Row>
-          <Col lg={3}>
+          <Col lg={4}>
             <Card className="card-spacing">
               <Card.Header>
                 Summary
@@ -427,7 +496,7 @@ const Insights = (props) => {
               </Card.Body>
             </Card>
           </Col>
-          <Col lg={9}>
+          <Col lg={8}>
             <Card className="card-equal-height">
               <Card.Header> Graph </Card.Header>
               <Card.Body>
@@ -452,6 +521,58 @@ const Insights = (props) => {
         </Row>
         }
       </div>
+    );
+  }
+  else if(props.model === "body") {
+    var minMaxAvg = calculateMinAndMaxBody();
+    var graphData = calculateBodyGraphData();
+    console.log(graphData);
+    return (
+      <Row>
+        <Col lg={4}>
+          <Card className="card-spacing">
+            <Card.Header>
+              Summary
+            </Card.Header>
+            <Card.Body>
+              <ListGroup variant="flush">
+                <ListGroup.Item>
+                  <div> <strong> Body Fat </strong> </div>
+                  <div className="indent"> Average: {minMaxAvg.avgBf} </div>
+                  <div className="indent"> Min: {minMaxAvg.minBf} </div>
+                  <div className="indent"> Max: {minMaxAvg.maxBf} </div>
+                </ListGroup.Item>
+                <ListGroup.Item>
+                  <div className="indent"> <strong> Body Weight </strong> </div>
+                  <div className="indent"> Average: {minMaxAvg.avgBw} </div>
+                  <div className="indent"> Min: {minMaxAvg.minBw} </div>
+                  <div className="indent"> Max: {minMaxAvg.maxBw} </div>
+                </ListGroup.Item>
+              </ListGroup>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col lg={8}>
+          <Card className="card-equal-height">
+            <Card.Header> Graph </Card.Header>
+            <Card.Body>
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  data={graphData}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line type="monotone" dataKey="body fat %" stroke="#8884d8" />
+                  <Line type="monotone" dataKey="body weight" stroke="#82ca9d" />
+                </LineChart>
+              </ResponsiveContainer>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
     );
   }
   else {
