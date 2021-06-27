@@ -35,8 +35,6 @@ const Diet = (props) => {
       alert("Could not get token");
       return;
     }
-    console.log(token);
-    console.log(user_id);
     const callback = (res) => {
       if(res.status == 200) {
         var temp = res.data.data;

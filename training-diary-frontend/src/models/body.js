@@ -45,8 +45,8 @@ export const bodyWeightMetaData = [
   new ModelMetaData("day", "number", undefined, "", false, 0, []),
   new ModelMetaData("month", "number", undefined, "", false, 0, []),
   new ModelMetaData("year", "number", undefined, "", false, 0, []),
-  new ModelMetaData("weight", "number", "input", "", true, 6, []),
-  new ModelMetaData("units", "string", "select", "", true, 6, [
+  new ModelMetaData("weight", "number", "input", "Weight", true, 6, []),
+  new ModelMetaData("units", "string", "select", "Units", true, 6, [
     "lbs.",
     "kgs."
   ]),

@@ -103,7 +103,12 @@ const DietModal = (props) => {
                 required
                 onChange={(date) => {
                   var copy = Object.assign({}, diet);
-                  copy.timestamp = date.getTime();
+                  if(date === null) {
+                    copy.timestamp = 0;
+                  }
+                  else {
+                    copy.timestamp = date.getTime();
+                  }
                   setDiet(copy);
                 }}
               />
