@@ -187,7 +187,7 @@ const Body = (props) => {
     CONTROLLER.editBodyWeightEntry(token, user_id, bodyWeight, callback, callbackOnError);
   }
 
-  const deleteBodyFatEntry = (bf_id, modalCallback) => {
+  const deleteBodyFatEntry = (bodyFat, modalCallback) => {
     var token = LOCAL_STORAGE.getStorageItem("TRAINING_DIARY_API_TOKEN");
     var user_id = LOCAL_STORAGE.getStorageItem("TRAINING_DIARY_USER");
     if(token === null || token === undefined || user_id === null || user_id === undefined) {
@@ -195,11 +195,12 @@ const Body = (props) => {
       alert("Could not get token");
       return;
     }
+    var bf_id = bodyFat.bf_id;
     const callback = (res) => {
       if(res.status == 200) {
         var copy = bfEntries.slice();
         for(var i = 0; i < copy.length; i++) {
-          if(copy[i].bf_id === res.data.data.bf_id) {
+          if(copy[i].bf_id === res.data.data) {
             copy.splice(i, 1);
             break;
           }
@@ -216,7 +217,7 @@ const Body = (props) => {
     CONTROLLER.deleteBodyFatEntry(token, user_id, bf_id, callback, callbackOnError);
   }
 
-  const deleteBodyWeightEntry = (bw_id, modalCallback) => {
+  const deleteBodyWeightEntry = (bodyWeight, modalCallback) => {
     var token = LOCAL_STORAGE.getStorageItem("TRAINING_DIARY_API_TOKEN");
     var user_id = LOCAL_STORAGE.getStorageItem("TRAINING_DIARY_USER");
     if(token === null || token === undefined || user_id === null || user_id === undefined) {
@@ -224,11 +225,13 @@ const Body = (props) => {
       alert("Could not get token");
       return;
     }
+    var bw_id = bodyWeight.bw_id;
     const callback = (res) => {
       if(res.status == 200) {
         var copy = bwEntries.slice();
         for(var i = 0; i < copy.length; i++) {
-          if(copy[i].bw_id === res.data.data.bw_id) {
+          console.log(res.data.data);
+          if(copy[i].bw_id === res.data.data) {
             copy.splice(i, 1);
             break;
           }

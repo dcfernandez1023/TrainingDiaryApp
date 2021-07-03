@@ -62,6 +62,7 @@ class BodyWeight:
         return None
 
     def delete(self, user_id, bw_id):
+        print(bw_id)
         self.__db.delete_one({"_id": bw_id, "user_id": user_id}, self.__collection)
         return bw_id
 

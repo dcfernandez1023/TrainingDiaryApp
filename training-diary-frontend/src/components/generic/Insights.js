@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
 import { Row, Col, Button, InputGroup, Form, ListGroup, Card, Table, Badge, DropdownButton, Dropdown } from 'react-bootstrap';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, PieChart, Pie, Legend, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import { LineChart, Line, XAxis, YAxis, ZAxis, CartesianGrid, PieChart, Pie, Legend, Cell, Tooltip, ResponsiveContainer,  ScatterChart,
+  Scatter } from "recharts";
 import DateRangePicker from '@wojtekmaj/react-daterange-picker';
 
 import '../../styles/insights.css';
@@ -314,6 +315,18 @@ const Insights = (props) => {
     }
     minMax.avgBf = Math.round(bfTotal / bfCount);
     minMax.avgBw = Math.round(bwTotal / bwCount);
+    if(isNaN(minMax.avgBf)) {
+      minMax.avgBf = "None";
+    }
+    if(isNaN(minMax.avgBw)) {
+      minMax.avgBw = "None";
+    }
+    if(minMax.minBf == Number.MAX_SAFE_INTEGER) {
+      minMax.minBf = "None";
+    }
+    if(minMax.minBw == Number.MAX_SAFE_INTEGER) {
+      minMax.minBw = "None";
+    }
     console.log(minMax);
     return minMax;
   }
@@ -326,17 +339,26 @@ const Insights = (props) => {
     copy.sort((ele1, ele2) => {
       return ele1.timestamp - ele2.timestamp;
     });
-    var data = [];
+    var bfData = [];
+    var bwData = [];
     for(var i = 0; i < copy.length; i++) {
       var entry = copy[i];
-      var dataPoint = {
-        name: new Date(entry.timestamp).toLocaleDateString(),
-        "body fat %": entry.percentage,
-        "body weight": entry.weight
+      if(entry.type === "BODY_FAT") {
+        var dataPoint = {
+          name: new Date(entry.timestamp).toLocaleDateString(),
+          "body fat %": entry.percentage,
+        };
+        bfData.push(dataPoint);
       }
-      data.push(dataPoint);
+      else if(entry.type === "BODY_WEIGHT") {
+        var dataPoint = {
+          name: new Date(entry.timestamp).toLocaleDateString(),
+          "body weight": entry.weight,
+        };
+        bwData.push(dataPoint);
+      }
     }
-    return data;
+    return {bfData: bfData, bwData: bwData};
   }
 
   if(entries === undefined) {
@@ -556,19 +578,37 @@ const Insights = (props) => {
           <Card className="card-equal-height">
             <Card.Header> Graph </Card.Header>
             <Card.Body>
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  data={graphData}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="body fat %" stroke="#8884d8" />
-                  <Line type="monotone" dataKey="body weight" stroke="#82ca9d" />
-                </LineChart>
-              </ResponsiveContainer>
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                data={graphData.bwData}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="body weight" stroke="#8884d8" />
+              </LineChart>
+            </ResponsiveContainer>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col lg={8} style={{minHeight: "400px"}}>
+          <Card className="card-equal-height">
+            <Card.Header> Graph </Card.Header>
+            <Card.Body>
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                data={graphData.bfData}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="body fat %" stroke="#82ca9d" />
+              </LineChart>
+            </ResponsiveContainer>
             </Card.Body>
           </Card>
         </Col>
