@@ -369,6 +369,48 @@ const Insights = (props) => {
       <div className="center-align"> You have no data to be analyzed </div>
     );
   }
+
+  const timeComponents = <Row>
+            <Col md={7} className="column-margin-spacing">
+              {Object.keys(timeFilter).length === 0 ?
+                <div> Showing data from: <Badge pills variant="dark"> All Time </Badge> </div>
+                :
+                <div>
+                  {timeFilter.name === "Custom" ?
+                  <div>
+                    <span> Showing Data From: </span>
+                    <DateRangePicker
+                      onChange={(dates) => {
+                        if(dates === null) {
+                          setTimeFilter({start: null, end: null, name: "Custom"});
+                          applyTimeFilter(null, null);
+                        }
+                        else {
+                          setTimeFilter({start: dates[0], end: dates[1], name: "Custom"});
+                          applyTimeFilter(dates[0], dates[1]);
+                        }
+                      }}
+                      value={[timeFilter.start, timeFilter.end]}
+                      className="diet-custom-spacing"
+                    />
+                  </div>
+                  :
+                    <div> Showing data from: <Badge pills variant="dark"> {timeFilter.name} </Badge> </div>
+                  }
+                </div>
+              }
+            </Col>
+            <Col className="right-align" md={5}>
+              <DropdownButton title="Date Range" variant="info">
+                {TIME_FILTERS.map((filter) => {
+                  return (
+                    <Dropdown.Item onClick={() => {onChangeDateRange(filter)}} active={filter === timeFilter.name}> {filter} </Dropdown.Item>
+                  );
+                })}
+              </DropdownButton>
+            </Col>
+          </Row>;
+
   if(props.model === "exercise") {
     const listData = calculateMostLoggedExercises();
     const pieData = calculateExerciseCategoryBreakdown();
@@ -448,46 +490,7 @@ const Insights = (props) => {
     ];
     return (
       <div>
-        <Row>
-          <Col md={7} className="column-margin-spacing">
-            {Object.keys(timeFilter).length === 0 ?
-              <div> Showing data from: <Badge pills variant="dark"> All Time </Badge> </div>
-              :
-              <div>
-                {timeFilter.name === "Custom" ?
-                <div>
-                  <span> Showing Data From: </span>
-                  <DateRangePicker
-                    onChange={(dates) => {
-                      if(dates === null) {
-                        setTimeFilter({start: null, end: null, name: "Custom"});
-                        applyTimeFilter(null, null);
-                      }
-                      else {
-                        setTimeFilter({start: dates[0], end: dates[1], name: "Custom"});
-                        applyTimeFilter(dates[0], dates[1]);
-                      }
-                    }}
-                    value={[timeFilter.start, timeFilter.end]}
-                    className="diet-custom-spacing"
-                  />
-                </div>
-                :
-                  <div> Showing data from: <Badge pills variant="dark"> {timeFilter.name} </Badge> </div>
-                }
-              </div>
-            }
-          </Col>
-          <Col className="right-align" md={5}>
-            <DropdownButton title="Date Range" variant="info">
-              {TIME_FILTERS.map((filter) => {
-                return (
-                  <Dropdown.Item onClick={() => {onChangeDateRange(filter)}} active={filter === timeFilter.name}> {filter} </Dropdown.Item>
-                );
-              })}
-            </DropdownButton>
-          </Col>
-        </Row>
+        {timeComponents}
         <br/>
         {entries.length === 0 && timeFilter.start !== null && timeFilter.end !== null ?
           <Row>
@@ -550,69 +553,82 @@ const Insights = (props) => {
     var graphData = calculateBodyGraphData();
     console.log(graphData);
     return (
-      <Row>
-        <Col lg={4}>
-          <Card className="card-spacing">
-            <Card.Header>
-              Summary
-            </Card.Header>
-            <Card.Body>
-              <ListGroup variant="flush">
-                <ListGroup.Item>
-                  <div> <strong> Body Fat </strong> </div>
-                  <div className="indent"> Average: {minMaxAvg.avgBf} </div>
-                  <div className="indent"> Min: {minMaxAvg.minBf} </div>
-                  <div className="indent"> Max: {minMaxAvg.maxBf} </div>
-                </ListGroup.Item>
-                <ListGroup.Item>
-                  <div className="indent"> <strong> Body Weight </strong> </div>
-                  <div className="indent"> Average: {minMaxAvg.avgBw} </div>
-                  <div className="indent"> Min: {minMaxAvg.minBw} </div>
-                  <div className="indent"> Max: {minMaxAvg.maxBw} </div>
-                </ListGroup.Item>
-              </ListGroup>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col lg={8}>
-          <Card className="card-equal-height">
-            <Card.Header> Graph </Card.Header>
-            <Card.Body>
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                data={graphData.bwData}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="body weight" stroke="#8884d8" />
-              </LineChart>
-            </ResponsiveContainer>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col lg={8} style={{minHeight: "400px"}}>
-          <Card className="card-equal-height">
-            <Card.Header> Graph </Card.Header>
-            <Card.Body>
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                data={graphData.bfData}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="body fat %" stroke="#82ca9d" />
-              </LineChart>
-            </ResponsiveContainer>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+      <div>
+        {timeComponents}
+        <br/>
+        {entries.length === 0 && timeFilter.start !== null && timeFilter.end !== null ?
+          <Row>
+            <Col className="center-align">
+              You have no data within the specified date range
+            </Col>
+          </Row>
+        :
+        <Row>
+          <Col lg={4}>
+            <Card className="card-spacing">
+              <Card.Header>
+                Summary
+              </Card.Header>
+              <Card.Body>
+                <ListGroup variant="flush">
+                  <ListGroup.Item>
+                    <div> <strong> Body Fat </strong> </div>
+                    <div className="indent"> Average: {minMaxAvg.avgBf} </div>
+                    <div className="indent"> Min: {minMaxAvg.minBf} </div>
+                    <div className="indent"> Max: {minMaxAvg.maxBf} </div>
+                  </ListGroup.Item>
+                  <ListGroup.Item>
+                    <div className="indent"> <strong> Body Weight </strong> </div>
+                    <div className="indent"> Average: {minMaxAvg.avgBw} </div>
+                    <div className="indent"> Min: {minMaxAvg.minBw} </div>
+                    <div className="indent"> Max: {minMaxAvg.maxBw} </div>
+                  </ListGroup.Item>
+                </ListGroup>
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col lg={8}>
+            <div>
+              <Card style={{minHeight: "300px"}} className="card-equal-height">
+                <Card.Header> Graph </Card.Header>
+                <Card.Body>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={graphData.bwData}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey="body weight" stroke="#8884d8" />
+                  </LineChart>
+                </ResponsiveContainer>
+                </Card.Body>
+              </Card>
+              <br/>
+              <Card style={{minHeight: "300px"}} className="card-equal-height">
+                <Card.Header> Graph </Card.Header>
+                <Card.Body>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={graphData.bfData}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey="body fat %" stroke="#82ca9d" />
+                  </LineChart>
+                </ResponsiveContainer>
+                </Card.Body>
+              </Card>
+            </div>
+          </Col>
+        </Row>
+      }
+      </div>
     );
   }
   else {

@@ -83,8 +83,8 @@ const EntryModal = (props) => {
       setSubmitDisabled(true);
       var user_id = LOCAL_STORAGE.getStorageItem("TRAINING_DIARY_USER");
       entryEdit.timestamp = entryDate.getTime();
-      entryEdit.day = entryDate.getDate() + 2;
-      entryEdit.month = entryDate.getMonth() + 2;
+      entryEdit.day = entryDate.getDate() + 1;
+      entryEdit.month = entryDate.getMonth() + 1;
       entryEdit.year = entryDate.getFullYear();
       entryEdit.notes = entryEdit.notes;
       props.onSubmitModal(entryEdit, closeModal);
