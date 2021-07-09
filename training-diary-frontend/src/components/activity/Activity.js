@@ -398,8 +398,7 @@ const Activity = (props) => {
         header={modalHeader}
         type={modalType}
         entry={model}
-        exercise={modalExercise}
-        entryDate={selectedDate}
+        exercise={modalExercise}  
         onClose={closeModals}
         onSubmitModal={modalType === "delete" ? deleteEntry : modalType === "edit" ? editEntry : createEntries}
         createNew={openExerciseModal}

@@ -51,6 +51,7 @@ const ExerciseModal = (props) => {
     setValidated(true);
     // ensure data types
     var copy = Object.assign({}, exercise);
+    console.log(copy);
     for(var i = 0; i < MODEL.metaData.length; i++) {
       var field = MODEL.metaData[i];
       if(copy[field.value].toString().trim().length == 0 && field.required && type !== "delete") {
