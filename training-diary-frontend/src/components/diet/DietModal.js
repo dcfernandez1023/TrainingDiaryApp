@@ -1,35 +1,44 @@
 import React, { useState, useEffect } from 'react';
 
 import { Container, Row, Col, Button, Spinner, Form, Modal } from 'react-bootstrap';
+import DatePicker from "react-datepicker";
 
-const LOCAL_STORAGE = require('../../util/localStorageHelper.js');
-const MODEL = require('../../models/exercise.js');
+const MODEL = require('../../models/diet.js');
+const UTIL = require('../../util/util.js');
 
 
 /*
    Props:
     * show
     * header
-    * exercise
+    * diet
     * type
     * onClose
     * onSubmitModal
 */
-const ExerciseModal = (props) => {
+const DietModal = (props) => {
   const [show, setShow] = useState(false);
   const [header, setHeader] = useState("");
-  const [exercise, setExercise] = useState();
+  const [diet, setDiet] = useState();
+  const [type, setType] = useState("");
   const [validated, setValidated] = useState(false);
   const [showSpinner, setShowSpinner] = useState(false);
   const [submitDisabled, setSubmitDisabled] = useState(false);
-  const [type, setType] = useState("");
 
   useEffect(() => {
     setShow(props.show);
     setHeader(props.header);
-    setExercise(props.exercise);
+    setDiet(props.diet);
     setType(props.type);
-  }, [props.show, props.header, props.exercise, props.type]);
+  }, [props.show, props.header, props.diet, props.type]);
+
+
+  const onChangeModalInput = (event) => {
+    setValidated(false);
+    var copy = Object.assign({}, diet);
+    copy[event.target.name] = event.target.value;
+    setDiet(copy);
+  }
 
   const closeModal = () => {
     setValidated(false);
@@ -38,19 +47,23 @@ const ExerciseModal = (props) => {
     props.onClose();
   }
 
-  const onChangeModalInput = (event) => {
-    setValidated(false);
-    var copy = Object.assign({}, exercise);
-    copy[event.target.name] = event.target.value;
-    setExercise(copy);
-  }
-
   // handles modal submit for adding, editing, and deleting an exercise
   const handleSubmit = (event) => {
     event.preventDefault();
     setValidated(true);
+    if(diet.timestamp === 0 || diet.timestamp === null) {
+      return;
+    }
     // ensure data types
-    var copy = Object.assign({}, exercise);
+    var copy = Object.assign({}, diet);
+    // get date
+    if(type === "add") {
+      var dateObj = new Date(diet.timestamp);
+      copy.timestamp = dateObj.getTime();
+      copy.day = dateObj.getDate() + 1;
+      copy.month = dateObj.getMonth() + 1;
+      copy.year = dateObj.getFullYear();
+    }
     console.log(copy);
     for(var i = 0; i < MODEL.metaData.length; i++) {
       var field = MODEL.metaData[i];
@@ -74,6 +87,45 @@ const ExerciseModal = (props) => {
       <Form onSubmit={handleSubmit} noValidate validated={validated}>
         <Modal.Body>
           <Row>
+            <Col xs={2}></Col>
+            <Col className="exercise-modal-input-spacing">
+              <Form.Label> Date </Form.Label>
+              <DatePicker
+                className="customDatePickerWidth"
+                placeholderText="Click to select a date"
+                selected={diet === undefined || diet.timestamp == 0 ? null : new Date(diet.timestamp)}
+                customInput={
+                  <Form.Control
+                    as="input"
+                    required
+                  />
+                }
+                required
+                onChange={(date) => {
+                  var copy = Object.assign({}, diet);
+                  if(date === null) {
+                    copy.timestamp = 0;
+                  }
+                  else {
+                    copy.timestamp = date.getTime();
+                  }
+                  setDiet(copy);
+                }}
+              />
+              {/*
+              <Form.Control
+                id="diet-date"
+                as="input"
+                type="date"
+                defaultValue={diet === undefined || diet.timestamp === 0 ? "" : UTIL.formatDate(diet.timestamp)}
+                required
+                disabled={type === "delete" || type === "edit"}
+              />
+              */}
+            </Col>
+            <Col xs={2}></Col>
+          </Row>
+          <Row>
           {MODEL.metaData.map((field) => {
             if(field.element === "input" || field.element === "textarea") {
               return (
@@ -83,7 +135,7 @@ const ExerciseModal = (props) => {
                     as={field.element}
                     type={field.type === "number" ? "number" : "text"}
                     name={field.value}
-                    value={exercise === undefined ? "" : exercise[field.value]}
+                    value={diet === undefined ? "" : diet[field.value]}
                     onChange={(e) => {onChangeModalInput(e)}}
                     rows={field.element === "textarea" ? 4 : undefined}
                     readOnly={type === "delete"}
@@ -99,7 +151,7 @@ const ExerciseModal = (props) => {
                   <Form.Control
                     as={field.element}
                     name={field.value}
-                    value={exercise === undefined ? "" : exercise[field.value]}
+                    value={diet === undefined ? "" : diet[field.value]}
                     onChange={(e) => {onChangeModalInput(e)}}
                     readOnly={type === "delete"}
                     disabled={type === "delete"}
@@ -108,7 +160,7 @@ const ExerciseModal = (props) => {
                     <option value="" selected> Select </option>
                     {field.options.map((option, index) => {
                       return (
-                        <option value={option} key={index} selected={exercise !== undefined && exercise[field.value] === option}> {option} </option>
+                        <option value={option} key={index} selected={diet !== undefined && diet[field.value] === option}> {option} </option>
                       );
                     })}
                   </Form.Control>
@@ -135,4 +187,4 @@ const ExerciseModal = (props) => {
   );
 }
 
-export default ExerciseModal;
+export default DietModal;

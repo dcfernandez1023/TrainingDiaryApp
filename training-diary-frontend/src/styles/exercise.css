@@ -31,6 +31,62 @@
   margin-left: 5px;
 }
 
+.sort-by-button {
+  margin-right: 10px;
+}
+
+.no-exercises-align {
+  text-align: center;
+}
+
+.entry-modal-next-align {
+  text-align: right;
+}
+
+.entry-modal-back-align {
+  text-align: left;
+}
+
+.entry-modal-create-new {
+  margin-left: 5px;
+}
+
+.entry-modal-create-new-align {
+  text-align: center;
+}
+
+.entry-modal-spinner-align {
+  text-align: center;
+}
+
+.center-align {
+  text-align: center;
+}
+
+.right-align {
+  text-align: right;
+}
+
+.log-column-1 {
+  width: 5%;
+}
+
+.log-column-2 {
+  width: 15%
+}
+
+.log-column-3 {
+  width: 40%;
+}
+
+.log-column-4 {
+  width: 40%;
+}
+
+.sort-width {
+  width: 30px;
+}
+
 .table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
 
 }

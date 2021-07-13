@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-import { Container, Row, Col, Navbar, Nav, Button, Spinner } from 'react-bootstrap';
+import { Container, Row, Col, Navbar, Nav, Button, Spinner, Dropdown, DropdownButton } from 'react-bootstrap';
 
 import Activity from './activity/Activity.js';
 import Body from './body/Body.js';
@@ -78,9 +78,20 @@ const Home = (props) => {
             <Nav.Link eventKey = {4}> Custom </Nav.Link>
           </Nav>
           <Nav>
-            <Button variant="info" onClick={logout}>
-              Logout
-            </Button>
+            <DropdownButton variant="info" title="👤" menuAlign="right">
+              <Dropdown.Item>
+                About
+              </Dropdown.Item>
+              <Dropdown.Item>
+                Settings
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => {window.open("https://docs.google.com/forms/d/e/1FAIpQLSczF5xdanw3RqbcrJ8qFRG0Xp0l12Osa1yvVeLMah3KjX_KXw/viewform?usp=sf_link", "_blank")}}>
+                Submit Feedback
+              </Dropdown.Item>
+              <Dropdown.Item onClick={logout}>
+                Logout
+              </Dropdown.Item>
+            </DropdownButton>
           </Nav>
         </Navbar.Collapse>
       </Navbar>

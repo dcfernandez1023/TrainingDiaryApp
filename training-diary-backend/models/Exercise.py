@@ -35,7 +35,6 @@ class Exercise:
         return res[0]
 
     def create(self, user_id, data):
-        print(data)
         if self.__validate_data(data):
             exercise_id = "exercise" + str(uuid.uuid1())
             data.update({
@@ -63,7 +62,7 @@ class Exercise:
 
     def delete(self, user_id, exercise_id):
         self.__db.delete_one({"_id": exercise_id, "user_id": user_id}, self.__collection)
-        self.__db.delete_many({"_id": user_id, "exercise_id": exercise_id}, "exercise_entries")
+        self.__db.delete_many({"user_id": user_id, "exercise_id": exercise_id}, "exercise_entries")
         return exercise_id
 
     def __validate_data(self, data):

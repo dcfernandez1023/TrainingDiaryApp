@@ -30,4 +30,5 @@ def call_api(func_name):
         params.update({"model": model, "function_name": func_name})
         return CONTROLLER.execute_model_logic(**params)
     except Exception as e:
+        print(e)
         return make_response({"message": "Internal Error: " + str(e)}, 500)

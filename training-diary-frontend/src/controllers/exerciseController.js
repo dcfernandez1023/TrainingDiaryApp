@@ -86,3 +86,51 @@ export const getEntries = (token, user_id, callback, callbackOnError) => {
       callbackOnError(error);
     });
 }
+
+// creates entries
+export const createEntries = (token, user_id, entries, callback, callbackOnError) => {
+  var endpoint = BASE_URL + ENTRY_BASE + "/create_many";
+  var body = {
+    token: token,
+    user_id: user_id,
+    data: entries
+  };
+  axios.post(endpoint, body)
+    .then((res) => {
+      callback(res);
+    }, (error) => {
+      callbackOnError(error);
+    });
+}
+
+// edits an entry
+export const editEntry = (token, user_id, entry, callback, callbackOnError) => {
+  var endpoint = BASE_URL + ENTRY_BASE + "/update";
+  var body = {
+    token: token,
+    user_id: user_id,
+    data: entry
+  };
+  axios.post(endpoint, body)
+    .then((res) => {
+      callback(res);
+    }, (error) => {
+      callbackOnError(error);
+    });
+}
+
+// deletes an entry
+export const deleteEntry = (token, user_id, exercise_entry_id, callback, callbackOnError) => {
+  var endpoint = BASE_URL + ENTRY_BASE + "/delete";
+  var body = {
+    token: token,
+    user_id: user_id,
+    exercise_entry_id: exercise_entry_id
+  };
+  axios.post(endpoint, body)
+    .then((res) => {
+      callback(res);
+    }, (error) => {
+      callbackOnError(error);
+    });
+}
